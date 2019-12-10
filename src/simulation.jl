@@ -69,6 +69,8 @@ function simulate(config::Config = Config())
                 Retweets = [t.retweet_count for t in tweet_list]
                 )
 
+    print("\n")
+
     return (df, tweet_df, graph_list), state, init_state
 end
 ;
