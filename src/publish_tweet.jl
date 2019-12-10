@@ -1,3 +1,13 @@
+"""
+    publish_tweet!(state, tweet_list, agent_idx, tick_nr)
+Publish a tweet to the network.
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `tweet_list`: List of all published tweets in network
+- `agent_idx`: agent index
+- `tick_nr`: Number of current simulation tick
+See also: [`Config`](@ref), [`Agent`](@ref)
+"""
 function publish_tweet!(
     state::Tuple{AbstractGraph, AbstractArray}, tweet_list::AbstractArray, agent_idx::Integer,
     tick_nr::Integer=0
