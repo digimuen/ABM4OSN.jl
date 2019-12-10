@@ -6,7 +6,7 @@ Create new directed edges from other agents.
 # Arguments
 - `state`: a tuple of the current graph and agent_list
 - `agent_idx`: agent index
-- `config`: Config object as provided by Config()
+- `config`: Config object as provided by Config
 
 See also: [`Config`](@ref), [`drop_input!`](@ref)
 """

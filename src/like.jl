@@ -1,3 +1,15 @@
+"""
+    like(state, agent_idx, config)
+
+Generate a like for an agent.
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `agent_idx`: agent index
+- `config`: Config object as provided by Config
+
+See also: [`Config`](@ref), [`Agent`](@ref)
+"""
 function like(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
     config::Config

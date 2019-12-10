@@ -1,3 +1,15 @@
+"""
+    drop_input!(state, agent_idx, config)
+
+Drop input for specific agent (~unfollow in Twitter).
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `agent_idx`: agent index
+- `config`: Config object as provided by Config
+
+See also: [`Config`](@ref), [`add_input!`](@ref)
+"""
 function drop_input!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
     config::Config
