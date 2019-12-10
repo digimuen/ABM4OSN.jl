@@ -20,3 +20,6 @@ function publish_tweet!(
     end
     return state, tweet_list
 end
+
+# suppress output of include()
+;

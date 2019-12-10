@@ -11,3 +11,6 @@ function update_check_regularity!(
     end
     return state
 end
+
+# suppress output of include()
+;
