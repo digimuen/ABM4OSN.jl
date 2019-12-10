@@ -3,10 +3,9 @@ function cfg_net(
     agent_count::Int64=100,
     m0::Int64=10,
     growth_rate::Int64=4,
-    new_follows::Int64=4,
-    initial_follows::Int64=4
+    new_follows::Int64=4
     )
-    return (agent_count=agent_count,m0=m0,growth_rate=growth_rate,new_follows=new_follows, initial_follows=initial_follows)
+    return (agent_count=agent_count,m0=m0,growth_rate=growth_rate,new_follows=new_follows)
 end
 
 function cfg_sim(
@@ -48,7 +47,7 @@ function cfg_feed(
 end
 
 struct Config
-    network::NamedTuple{(:agent_count, :m0, :growth_rate, :new_follows, :initial_follows),NTuple{5,Int64}}
+    network::NamedTuple{(:agent_count, :m0, :growth_rate, :new_follows),NTuple{4,Int64}}
     simulation::NamedTuple{(:n_iter, :max_inactive_ticks),NTuple{2,Int64}}
     opinion_treshs::NamedTuple{(:like, :retweet, :backfire, :check_unease, :follow, :unfollow),NTuple{6,Float64}}
     agent_props::NamedTuple{(:own_opinion_weight, :check_decrease, :inclin_interact_lambda, :unfollow_rate),NTuple{4,Float64}}
