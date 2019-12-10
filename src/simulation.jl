@@ -1,4 +1,16 @@
-# simulation step
+"""
+    tick!(state, tweet_list, tick_nr, config)
+
+Runs a single tick of the simulation and returns the updated state and simulation logs.
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `tweet_list`: List of all published tweets in network
+- `tick_nr`: Number of current simulation tick
+- `config`: Config object as provided by Config()
+
+See also: [log_network](@ref), [simulate!](@ref), [Config](@ref)
+"""
 function tick!(
     state::Tuple{AbstractGraph, AbstractArray}, tweet_list::AbstractArray,
     tick_nr::Int64, config::Config
@@ -34,7 +46,16 @@ function tick!(
     return log_network(state, tick_nr)
 end
 
-# the actual simulation
+"""
+    simulate(config)
+
+Creates the initial state, performs and logs simulation ticks and returns the collected data
+
+# Arguments
+- `config`: Config object as provided by Config()
+
+See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
+"""
 function simulate(
     config::Config = Config()
 )

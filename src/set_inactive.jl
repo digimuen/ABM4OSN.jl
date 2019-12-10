@@ -1,3 +1,15 @@
+"""
+   set_inactive!(state, agent_idx, tweet_list)
+
+Sets an agent's state to inactive and deletes all his connections to others and tweets
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `agent_idx`: agent index
+- `tweet_list`: List of all published tweets in network
+
+See also: [`Agent`](@ref), [`tick!`](@ref)
+"""
 function set_inactive!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer, tweet_list::AbstractArray
 )

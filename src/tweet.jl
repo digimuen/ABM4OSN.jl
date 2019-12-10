@@ -1,3 +1,22 @@
+"""
+    Tweet(opinion, weight, source_agent, published_at)
+
+Provide data structure for tweets of agents within agent-based simulation.
+
+# Examples
+```julia-repl
+julia>Tweet(0, 0, 1, 1)
+Agent(0.0, 0.0 , 1, 1)
+```
+
+# Arguments
+- `opinion`: opinion value between -1 and 1
+- `weight`: weight value for importance of tweet
+- `source_agent`: ID of origin agent of tweet
+- `published_at`: publication time of tweet
+
+See also: [Agent](@ref), [update_feed!](@ref)
+"""
 mutable struct Tweet
     opinion::Float64
     weight::Float64

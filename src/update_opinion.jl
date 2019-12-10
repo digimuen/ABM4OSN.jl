@@ -1,3 +1,15 @@
+"""
+   update_opinion!(state, agent_idx, config)
+
+Update an agent's opinion depending on its perceived public opinion
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `agent_idx`: agent index
+- `config`: Config object as provided by Config()
+
+See also: [`Config`](@ref), [`update__perceiv_publ_opinion!`](@ref)
+"""
 function update_opinion!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
     config::Config

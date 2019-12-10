@@ -1,3 +1,14 @@
+"""
+   update_perceiv_publ_opinion!(state, agent_idx)
+
+Update an agent's perceived public opinion depending on its neighbors and current feed
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `agent_idx`: agent index
+
+See also: [`Config`](@ref), [`update_opinion!`](@ref)
+"""
 function update_perceiv_publ_opinion!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer
 )
