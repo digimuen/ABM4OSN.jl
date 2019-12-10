@@ -6,10 +6,10 @@ function retweet!(
     this_agent = agent_list[agent_idx]
     for tweet in this_agent.feed
         if ((abs(this_agent.opinion - tweet.opinion) < config.opinion_treshs.retweet)
-            && !(tweet in this_agent.retweeted_Tweets))
+            && !(tweet in this_agent.retweeted_tweets))
             tweet.weight *= 1.01
             tweet.retweet_count += 1
-            push!(this_agent.retweeted_Tweets, tweet)
+            push!(this_agent.retweeted_tweets, tweet)
             for neighbor in outneighbors(graph, agent_idx)
                 push!(agent_list[neighbor].feed, tweet)
             end
@@ -18,3 +18,6 @@ function retweet!(
     end
     return state
 end
+
+# suppress output of include()
+;

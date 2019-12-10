@@ -2,8 +2,7 @@
 function tick!(
     state::Tuple{AbstractGraph, AbstractArray}, tweet_list::AbstractArray,
     tick_nr::Int64, config::Config
-    )
-
+)
     agent_list = state[2]
     for agent_idx in shuffle(1:length(agent_list))
         this_agent = agent_list[agent_idx]
@@ -36,8 +35,10 @@ function tick!(
 end
 
 # the actual simulation
-function simulate(config::Config = Config())
-    graph = create_network(config.network.agent_count,config.network.m0)
+function simulate(
+    config::Config = Config()
+)
+    graph = create_network(config.network.agent_count, config.network.m0)
     init_state = (graph, create_agents(graph))
     state = deepcopy(init_state)
     tweet_list = Array{Tweet, 1}(undef, 0)
@@ -61,16 +62,18 @@ function simulate(config::Config = Config())
     end
 
     tweet_df = DataFrame(
-                Opinion = [t.opinion for t in tweet_list],
-                Weight = [t.weight for t in tweet_list],
-                Source_Agent = [t.source_agent for t in tweet_list],
-                Published_At = [t.published_at for t in tweet_list],
-                Likes = [t.like_count for t in tweet_list],
-                Retweets = [t.retweet_count for t in tweet_list]
-                )
+        Opinion = [t.opinion for t in tweet_list],
+        Weight = [t.weight for t in tweet_list],
+        Source_Agent = [t.source_agent for t in tweet_list],
+        Published_At = [t.published_at for t in tweet_list],
+        Likes = [t.like_count for t in tweet_list],
+        Retweets = [t.retweet_count for t in tweet_list]
+    )
 
-    print("\n")
+    print("\nFinished simulation run with the following specifications:\n $config")
 
     return (df, tweet_df, graph_list), state, init_state
 end
+
+# suppress output of include()
 ;

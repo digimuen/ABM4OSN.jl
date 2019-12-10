@@ -1,7 +1,7 @@
 using ABM4OSN
 using Test
 
-sim = simulate()
+sim = simulate();
 
 length(sim[3][2])
 

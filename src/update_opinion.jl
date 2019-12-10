@@ -25,3 +25,6 @@ function update_opinion!(
     end
     return state
 end
+
+# suppress output of include()
+;

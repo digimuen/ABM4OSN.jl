@@ -25,3 +25,6 @@ function update_perceiv_publ_opinion!(
     this_agent.perceiv_publ_opinion = mean([input_opinion_mean, feed_opinion_mean])
     return state
 end
+
+# suppress output of include()
+;

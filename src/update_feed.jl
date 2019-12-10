@@ -20,3 +20,6 @@ function update_feed!(
     end
     return state
 end
+
+# suppress output of include()
+;

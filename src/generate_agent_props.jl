@@ -14,3 +14,6 @@ end
 function generate_check_regularity()
     return 1 - (rand() / 4)^2
 end
+
+# suppress output of include()
+;

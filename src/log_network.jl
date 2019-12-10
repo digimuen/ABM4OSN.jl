@@ -1,4 +1,6 @@
-function log_network(state::Tuple{AbstractGraph, AbstractArray}, tick_nr::Int64)
+function log_network(
+    state::Tuple{AbstractGraph, AbstractArray}, tick_nr::Int64
+)
     graph, agent_list = state
     agent_opinion = [a.opinion for a in agent_list]
     agent_perceiv_publ_opinion = [a.perceiv_publ_opinion for a in agent_list]
@@ -17,3 +19,6 @@ function log_network(state::Tuple{AbstractGraph, AbstractArray}, tick_nr::Int64)
         ActiveState = agent_active_state
     )
 end
+
+# suppress output of include()
+;
