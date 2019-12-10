@@ -1,3 +1,14 @@
+"""
+    log_network(state, tick_nr)
+
+Log the current state of a simulation.
+
+# Arguments
+- `state`: a tuple of the current graph and agent_list
+- `tick_nr`: current tick in the simulation 
+
+See also: [`tick!`](@ref), [`simulate`](@ref)
+"""
 function log_network(
     state::Tuple{AbstractGraph, AbstractArray}, tick_nr::Int64
 )
