@@ -39,7 +39,7 @@ function update_network!(
         push!(agent_list, Agent(generate_opinion(), generate_inclin_interact(), generate_check_regularity()))
         add_vertex!(graph)
         shuffle!(pref_attach_list)
-        for i in 1:config.network.initial_follows
+        for i in 1:config.network.m0
             add_edge!(graph, nv(graph), pref_attach_list[i])
         end
     end
