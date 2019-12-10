@@ -28,6 +28,11 @@ include("update_perceiv_publ_opinion.jl")
 
 export simulate
 export Config
+export cfg_ag
+export cfg_feed
+export cfg_net
+export cfg_ot
+export cfg_sim
 
 greet() = print("Hello World!")
 
