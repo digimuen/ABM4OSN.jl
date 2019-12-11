@@ -74,12 +74,16 @@ function simulate(
         Indegree = Float64[],
         ActiveState = Bool[]
     )
+    print("Current Tick: 0")
     for i in 1:config.simulation.n_iter
+        print('\r')
+        print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(state[1])/nv(state[1]))) * ", max indegree: " * string(maximum(indegree(state[1]))) * ", current Tweets: " * string(length(tweet_list)))
         append!(df, tick!(state, tweet_list, i, config))
         if i % ceil(config.simulation.n_iter / 10) == 0
             print(".")
             push!(graph_list, deepcopy(state[1]))
         end
+
     end
 
     tweet_df = DataFrame(

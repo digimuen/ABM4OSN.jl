@@ -24,6 +24,7 @@ mutable struct Agent
     active::Bool
     inactive_ticks::Int16
     feed::Array{Tweet, 1}
+    feed_min_weight::Float64
     liked_tweets::Array{Tweet, 1}
     retweeted_tweets::Array{Tweet, 1}
     function Agent(opinion, inclin_interact, check_regularity)
@@ -43,6 +44,7 @@ mutable struct Agent
             true,
             0,
             Array{Tweet, 1}(undef, 0),
+            0,
             Array{Tweet, 1}(undef, 0),
             Array{Tweet, 1}(undef, 0)
         )

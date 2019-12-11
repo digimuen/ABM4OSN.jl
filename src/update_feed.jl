@@ -30,6 +30,7 @@ function update_feed!(
     if length(this_agent.feed) > config.feed_props.feed_size
         this_agent.feed = this_agent.feed[1:config.feed_props.feed_size]
     end
+    this_agent.feed_min_weight = minimum([tweet.weight for tweet in this_agent.feed]) * config.feed_props.tweet_decay
     return state
 end
 
