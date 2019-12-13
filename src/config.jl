@@ -124,12 +124,14 @@ function cfg_ag(
     check_decrease::Float64=0.9,
     inclin_interact_lambda::Float64=log(25),
     unfollow_rate::Float64=0.2,
+    min_input_count::Int64=10
 )
     return (
         own_opinion_weight=own_opinion_weight,
         check_decrease=check_decrease,
         inclin_interact_lambda=inclin_interact_lambda,
         unfollow_rate=unfollow_rate
+        min_input_count=min_input_count
     )
 end
 
@@ -195,8 +197,8 @@ struct Config
         NTuple{6,Float64}
     }
     agent_props::NamedTuple{
-        (:own_opinion_weight, :check_decrease, :inclin_interact_lambda, :unfollow_rate), 
-        NTuple{4,Float64}
+        (:own_opinion_weight, :check_decrease, :inclin_interact_lambda, :unfollow_rate, :min_input_count),
+        <:Tuple{Float64, Float64, Float64, Float64, Int64}
     }
     feed_props::NamedTuple{
         (:feed_size, :tweet_decay), 
