@@ -22,6 +22,7 @@ mutable struct Tweet
     weight::Float64
     source_agent::Int64
     published_at::Int64
+    seen::Bool
     like_count::Int64
     retweet_count::Int64
     function Tweet(opinion, weight, source_agent, published_at)
@@ -37,6 +38,7 @@ mutable struct Tweet
             weight,
             source_agent,
             published_at,
+            false,
             0,
             0
         )

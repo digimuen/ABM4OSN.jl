@@ -25,7 +25,7 @@ function tick!(
             like(state, agent_idx, config)
             retweet!(state, agent_idx, config)
             drop_input!(state, agent_idx, config)
-            add_input!(state, agent_idx, config)
+            add_input!(state, agent_idx, tweet_list, config)
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
                 if rand() < inclin_interact
@@ -87,6 +87,7 @@ function simulate(
         Weight = [t.weight for t in tweet_list],
         Source_Agent = [t.source_agent for t in tweet_list],
         Published_At = [t.published_at for t in tweet_list],
+        Seen = [t.seen for t in tweet_list],
         Likes = [t.like_count for t in tweet_list],
         Retweets = [t.retweet_count for t in tweet_list]
     )
