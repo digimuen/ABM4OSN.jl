@@ -25,7 +25,7 @@ function tick!(
             like(state, agent_idx, config)
             retweet!(state, agent_idx, config)
             drop_input!(state, agent_idx, config)
-            add_input!(state, agent_idx, config)
+            add_input!(state, agent_idx, tweet_list, config)
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
                 if rand() < inclin_interact

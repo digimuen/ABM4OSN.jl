@@ -130,7 +130,7 @@ function cfg_ag(
         own_opinion_weight=own_opinion_weight,
         check_decrease=check_decrease,
         inclin_interact_lambda=inclin_interact_lambda,
-        unfollow_rate=unfollow_rate
+        unfollow_rate=unfollow_rate,
         min_input_count=min_input_count
     )
 end

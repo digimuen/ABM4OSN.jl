@@ -24,7 +24,7 @@ function add_input!(
     end
 
     if length(input_candidates) == 0
-        input_queue = Array{Tuple{Int64,Int64}}
+        input_queue = Array{Tuple{Int64,Int64}}(undef, 0)
         not_neighbors = setdiff([1:(agent_idx - 1); (agent_idx + 1):nv(graph)], inneighbors(graph, agent_idx))
         for candidate in not_neighbors
             if abs(this_agent.opinion - agent_list[candidate].opinion) < config.opinion_treshs.follow
