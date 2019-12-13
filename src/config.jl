@@ -124,7 +124,7 @@ function cfg_ag(
     check_decrease::Float64=0.9,
     inclin_interact_lambda::Float64=log(25),
     unfollow_rate::Float64=0.2,
-    min_input_count::Int64=10
+    min_input_count::Int64=0
 )
     return (
         own_opinion_weight=own_opinion_weight,
