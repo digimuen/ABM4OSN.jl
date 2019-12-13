@@ -87,6 +87,7 @@ function simulate(
         Weight = [t.weight for t in tweet_list],
         Source_Agent = [t.source_agent for t in tweet_list],
         Published_At = [t.published_at for t in tweet_list],
+        Seen = [t.seen for t in tweet_list],
         Likes = [t.like_count for t in tweet_list],
         Retweets = [t.retweet_count for t in tweet_list]
     )
