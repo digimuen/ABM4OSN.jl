@@ -22,10 +22,10 @@ function drop_input!(
     for tweet in this_agent.feed
         if abs(tweet.opinion - this_agent.opinion) > config.opinion_treshs.unfollow
             if abs(agent_list[tweet.source_agent].opinion - this_agent.opinion) > config.opinion_treshs.unfollow
-                # add agents with higher follower count than own only with certain probability?
-                if (indegree(graph, tweet.source_agent) / indegree(graph, agent_idx) > 1 && rand() > 0.5)
+                # Remove agents with higher follower count than own only with certain probability?
+                if (outdegree(graph, tweet.source_agent) / outdegree(graph, agent_idx) > 1 && rand() > 0.5)
                     push!(unfollow_candidates, (tweet.source_agent, indegree(graph, tweet.source_agent)))
-                elseif (indegree(graph, tweet.source_agent) / indegree(graph, agent_idx) <= 1)
+                elseif (outdegree(graph, tweet.source_agent) / outdegree(graph, agent_idx) <= 1)
                     push!(unfollow_candidates, (tweet.source_agent, indegree(graph, tweet.source_agent)))
                 end
             end
