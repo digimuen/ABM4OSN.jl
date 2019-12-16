@@ -17,7 +17,7 @@ function update_opinion!(
     agent_list = state[2]
     this_agent = agent_list[agent_idx]
     # weighted mean of own opinion and perceived public opinion
-    if (abs(this_agent.opinion - this_agent.perceiv_publ_opinion) < config.opinion_treshs.backfire)
+    if (abs(this_agent.opinion - this_agent.perceiv_publ_opinion) < config.opinion_threshs.backfire)
         this_agent.opinion = (
             config.agent_props.own_opinion_weight * this_agent.opinion
             + (1 - config.agent_props.own_opinion_weight) * this_agent.perceiv_publ_opinion

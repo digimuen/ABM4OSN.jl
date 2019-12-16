@@ -20,8 +20,8 @@ function drop_input!(
     # and remove them if source agent opinion is also too different
     unfollow_candidates = Array{Tuple{Int64, Int64}, 1}()
     for tweet in this_agent.feed
-        if abs(tweet.opinion - this_agent.opinion) > config.opinion_treshs.unfollow
-            if abs(agent_list[tweet.source_agent].opinion - this_agent.opinion) > config.opinion_treshs.unfollow
+        if abs(tweet.opinion - this_agent.opinion) > config.opinion_threshs.unfollow
+            if abs(agent_list[tweet.source_agent].opinion - this_agent.opinion) > config.opinion_threshs.unfollow
                 # Remove agents with higher follower count than own only with certain probability?
                 if (outdegree(graph, tweet.source_agent) / outdegree(graph, agent_idx) > 1 && rand() > 0.5)
                     push!(unfollow_candidates, (tweet.source_agent, indegree(graph, tweet.source_agent)))

@@ -16,7 +16,7 @@ function retweet!(
     graph, agent_list = state
     this_agent = agent_list[agent_idx]
     for tweet in this_agent.feed
-        if ((abs(this_agent.opinion - tweet.opinion) < config.opinion_treshs.retweet)
+        if ((abs(this_agent.opinion - tweet.opinion) < config.opinion_threshs.retweet)
             && !(tweet in this_agent.retweeted_tweets))
             tweet.weight *= 1.01
             tweet.retweet_count += 1
