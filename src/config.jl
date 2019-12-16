@@ -44,7 +44,7 @@ julia>cfg_sim()
 
 # Arguments
 - `n_iter`: number of iterations
-- `max_inactive_ticks`: after how many ticks an agent's status is set to inactive 
+- `max_inactive_ticks`: after how many ticks an agent's status is set to inactive
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref)
 """
@@ -112,8 +112,8 @@ julia>cfg_ag()
 
 # Arguments
 - `own_opinion_weight`: weight of own opinion in relation to other opinions
-- `check_decrease`: decrease factor for check regularity 
-- `inclin_interact_lambda`: lambda for exponential distribution for inclination to interact 
+- `check_decrease`: decrease factor for check regularity
+- `inclin_interact_lambda`: lambda for exponential distribution for inclination to interact
 - `unfollow_rate`: fraction of agents to unfollow each tick
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_feed](@ref)
@@ -147,7 +147,7 @@ julia>cfg_feed()
 ```
 
 # Arguments
-- `feed_size`: length of tweet feed 
+- `feed_size`: length of tweet feed
 - `tweet_decay`: decay factor for tweets in each tick
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref)
@@ -158,13 +158,13 @@ function cfg_feed(
     tweet_decay::Float64=0.5
 )
     return (
-        feed_size=feed_size, 
+        feed_size=feed_size,
         tweet_decay=tweet_decay
     )
 end
 
 """
-    Config(;[network=cfg_net(), simulation=cfg_sim(), opinion_treshs=cfg_ot(), agent_props=cfg_ag(), feed_props=cfg_feed()])
+    Config(;[network=cfg_net(), simulation=cfg_sim(), opinion_threshs=cfg_ot(), agent_props=cfg_ag(), feed_props=cfg_feed()])
 
 Provide configuration parameters for an agent-based simulation.
 
@@ -175,25 +175,25 @@ Config((agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4), (n_iter =
 ```
 
 # Arguments
-- `network`: tuple of network parameters as created by cfg_net 
-- `simulation`: tuple of simulation parameters as created by cfg_sim 
-- `opinion_treshs`: tuple of opinion difference thresholds as created by cfg_ot
-- `agent_props`: tuple of agent parameters as created by cfg_ag 
+- `network`: tuple of network parameters as created by cfg_net
+- `simulation`: tuple of simulation parameters as created by cfg_sim
+- `opinion_threshs`: tuple of opinion difference thresholds as created by cfg_ot
+- `agent_props`: tuple of agent parameters as created by cfg_ag
 - `feed_props`: tuple of feed parameters as created by cfg_feed
 
 See also: [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref)
 """
 struct Config
     network::NamedTuple{
-        (:agent_count, :m0, :growth_rate, :new_follows), 
+        (:agent_count, :m0, :growth_rate, :new_follows),
         NTuple{4,Int64}
     }
     simulation::NamedTuple{
-        (:n_iter, :max_inactive_ticks), 
+        (:n_iter, :max_inactive_ticks),
         NTuple{2,Int64}
     }
-    opinion_treshs::NamedTuple{
-        (:like, :retweet, :backfire, :check_unease, :follow, :unfollow), 
+    opinion_threshs::NamedTuple{
+        (:like, :retweet, :backfire, :check_unease, :follow, :unfollow),
         NTuple{6,Float64}
     }
     agent_props::NamedTuple{
@@ -201,19 +201,19 @@ struct Config
         <:Tuple{Float64, Float64, Float64, Float64, Int64}
     }
     feed_props::NamedTuple{
-        (:feed_size, :tweet_decay), 
+        (:feed_size, :tweet_decay),
         <:Tuple{Int64, Float64}
     }
     # constructor
     function Config(
         ;
-        network = cfg_net(), 
-        simulation = cfg_sim(), 
-        opinion_treshs = cfg_ot(), 
-        agent_props = cfg_ag(), 
+        network = cfg_net(),
+        simulation = cfg_sim(),
+        opinion_threshs = cfg_ot(),
+        agent_props = cfg_ag(),
         feed_props = cfg_feed()
     )
-        new(network, simulation, opinion_treshs, agent_props, feed_props)
+        new(network, simulation, opinion_threshs, agent_props, feed_props)
     end
 end
 

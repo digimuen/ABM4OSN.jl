@@ -27,7 +27,7 @@ function add_input!(
         input_queue = Array{Tuple{Int64,Int64}, 1}()
         not_neighbors = setdiff([1:(agent_idx - 1); (agent_idx + 1):nv(graph)], inneighbors(graph, agent_idx))
         for candidate in not_neighbors
-            if abs(this_agent.opinion - agent_list[candidate].opinion) < config.opinion_treshs.follow
+            if abs(this_agent.opinion - agent_list[candidate].opinion) < config.opinion_threshs.follow
                 push!(input_queue, (candidate, outdegree(graph, candidate)))
             end
         end
@@ -54,7 +54,7 @@ function add_input!(
     for _ in 1:new_input_count
         new_neighbor = popfirst!(input_queue)
         add_edge!(graph, new_neighbor, agent_idx)
-        if (abs(this_agent.opinion - agent_list[new_neighbor].opinion) < config.opinion_treshs.follow
+        if (abs(this_agent.opinion - agent_list[new_neighbor].opinion) < config.opinion_threshs.follow
             && indegree(graph, agent_idx) > indegree(graph, new_neighbor))
             add_edge!(graph, agent_idx, new_neighbor)
         end
