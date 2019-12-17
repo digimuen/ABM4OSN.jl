@@ -16,6 +16,8 @@ module ABM4OSN
     using Statistics
     using Random
     using StatsBase
+    using JLD
+    using JLD2
 
     # contain structs
     include("config.jl")

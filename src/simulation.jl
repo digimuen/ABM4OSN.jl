@@ -25,7 +25,9 @@ function tick!(
             like(state, agent_idx, config)
             retweet!(state, agent_idx, config)
             drop_input!(state, agent_idx, config)
-            add_input!(state, agent_idx, tweet_list, config)
+            if indegree(state[1], agent_idx) / nv(state[1]) * 2 < rand()
+                add_input!(state, agent_idx, tweet_list, config)
+            end
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
                 if rand() < inclin_interact
@@ -57,7 +59,7 @@ Creates the initial state, performs and logs simulation ticks and returns the co
 See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
 """
 function simulate(
-    config::Config = Config()
+    config::Config = Config(); batch_desc::String=""
 )
     graph = create_network(config.network.agent_count, config.network.m0)
     init_state = (graph, create_agents(graph))
@@ -74,12 +76,29 @@ function simulate(
         Indegree = Float64[],
         ActiveState = Bool[]
     )
+    if !in("tmp", readdir())
+        mkdir("tmp")
+    end
+    if batch_desc == ""
+        print("Current Tick: 0")
+    end
     for i in 1:config.simulation.n_iter
+        current_network = deepcopy(state[1])
+        rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
+        if batch_desc == ""
+            print('\r')
+            print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(current_network)/nv(current_network))) * ", max outdegree: " * string(maximum(outdegree(current_network))) * ", mean outdegree: " * string(mean(outdegree(current_network))) * ", current Tweets: " * string(length(tweet_list)))
+        end
         append!(df, tick!(state, tweet_list, i, config))
         if i % ceil(config.simulation.n_iter / 10) == 0
-            print(".")
-            push!(graph_list, deepcopy(state[1]))
+            if batch_desc != ""
+                print(".")
+            end
+            push!(graph_list, current_network)
+
+            save(("./tmp/" * batch_desc * "_tmpstate.jld2"), string(i), (string(config), (df, tweet_list, graph_list), state, init_state))
         end
+
     end
 
     tweet_df = DataFrame(
@@ -92,7 +111,10 @@ function simulate(
         Retweets = [t.retweet_count for t in tweet_list]
     )
 
-    print("\nFinished simulation run with the following specifications:\n $config")
+    save(("./results/" * batch_desc * "_results.jld2"), batch_desc, (string(config), (df, tweet_df, graph_list), state, init_state))
+    rm("./tmp/" * batch_desc * "_tmpstate.jld2")
+
+    print("\n---\nFinished simulation run with the following specifications:\n $config\n---\n")
 
     return (df, tweet_df, graph_list), state, init_state
 end
