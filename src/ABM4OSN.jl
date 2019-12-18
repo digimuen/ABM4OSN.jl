@@ -18,6 +18,8 @@ module ABM4OSN
     using StatsBase
     using JLD
     using JLD2
+    using CSV
+    using GraphIO
 
     # contain structs
     include("config.jl")
@@ -40,10 +42,12 @@ module ABM4OSN
     include("update_feed.jl")
     include("update_opinion.jl")
     include("update_perceiv_publ_opinion.jl")
+    include("convert_results.jl")
 
     # exports for user interaction
     export simulate
     export simulate_batch
+    export convert_results
     export Config
     export cfg_ag
     export cfg_feed

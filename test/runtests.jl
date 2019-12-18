@@ -12,7 +12,9 @@ end
 
 batch
 
-result = simulate(Config(agent_props=cfg_ag(mean_desired_input_count = 200)))
+simulate_batch(batch, batch_desc="Agentcount")
+
+convert_results()
 result[1]
 
 result = load("results/_tmpstate.jld2")[""]
