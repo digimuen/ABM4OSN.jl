@@ -22,8 +22,8 @@ function update_perceiv_publ_opinion!(
         input_opinion_mean = this_agent.opinion
     end
     # compute feed opinion
-    feed_opinions = [tweet.opinion for tweet in this_agent.feed]
-    feed_weights = [tweet.weight for tweet in this_agent.feed]
+    feed_opinions = [post.opinion for post in this_agent.feed]
+    feed_weights = [post.weight for post in this_agent.feed]
     if length(feed_opinions) > 0
         feed_opinion_mean = (
             sum([opinion * weight for (opinion, weight) in zip(feed_opinions, feed_weights)]) /

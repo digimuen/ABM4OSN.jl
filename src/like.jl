@@ -21,10 +21,10 @@ function like(
     while inclin_interact > rand()
         if i < length(this_agent.feed)
             if ((abs(this_agent.feed[i].opinion - this_agent.opinion) < config.opinion_threshs.like)
-                && !(this_agent.feed[i] in this_agent.liked_tweets))
+                && !(this_agent.feed[i] in this_agent.liked_posts))
                 this_agent.feed[i].like_count += 1
                 this_agent.feed[i].weight *= 1.01
-                push!(this_agent.liked_tweets, this_agent.feed[i])
+                push!(this_agent.liked_posts, this_agent.feed[i])
             end
         else
             break

@@ -6,7 +6,7 @@ Provide data structure for agents within agent-based simulation.
 # Examples
 ```julia-repl
 julia>Agent(0, 0, 0)
-Agent(0.0, 0.0 , 0.0, 0.0, true, 0, Tweet[], Tweet[], Tweet[])
+Agent(0.0, 0.0 , 0.0, 0.0, true, 0, Post[], Post[], Post[])
 ```
 
 # Arguments
@@ -14,7 +14,7 @@ Agent(0.0, 0.0 , 0.0, 0.0, true, 0, Tweet[], Tweet[], Tweet[])
 - `inclin_interact`: value for inclination to interact between 0 and 1
 - `check_regularity`: value for check regularity between 0 and 1
 
-See also: [Tweet](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@ref), [generate_check_regularity](@ref)
+See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@ref), [generate_check_regularity](@ref)
 """
 mutable struct Agent
     id::Int64
@@ -24,9 +24,9 @@ mutable struct Agent
     check_regularity::Float64
     active::Bool
     inactive_ticks::Int16
-    feed::Array{Tweet, 1}
-    liked_tweets::Array{Tweet, 1}
-    retweeted_tweets::Array{Tweet, 1}
+    feed::Array{Post, 1}
+    liked_posts::Array{Post, 1}
+    shared_posts::Array{Post, 1}
     function Agent(id, opinion, inclin_interact, check_regularity)
         # check if opinion value is valid
         if opinion < -1 || opinion > 1
@@ -44,9 +44,9 @@ mutable struct Agent
             check_regularity,
             true,
             0,
-            Array{Tweet, 1}(undef, 0),
-            Array{Tweet, 1}(undef, 0),
-            Array{Tweet, 1}(undef, 0)
+            Array{Post, 1}(undef, 0),
+            Array{Post, 1}(undef, 0),
+            Array{Post, 1}(undef, 0)
         )
     end
 end

@@ -1,7 +1,7 @@
 """
    update_feed!(state, agent_idx, config)
 
-Update an agent's feed by applying deletions, weight decays and sorting after tweet weight
+Update an agent's feed by applying deletions, weight decays and sorting after post weight
 
 # Arguments
 - `state`: a tuple of the current graph and agent_list
@@ -17,22 +17,24 @@ function update_feed!(
     graph, agent_list = state
     this_agent = agent_list[agent_idx]
     unique!(this_agent.feed)
-    deleted_tweets = Integer[]
-    for (index, tweet) in enumerate(this_agent.feed)
-        if tweet.weight == -1 || !(tweet.source_agent in inneighbors(graph, agent_idx))
-            push!(deleted_tweets, index)
+    deleted_posts = Integer[]
+    for (index, post) in enumerate(this_agent.feed)
+        if post.weight == -1 || !(post.source_agent in inneighbors(graph, agent_idx))
+            push!(deleted_posts, index)
         else
-            tweet.weight = config.feed_props.tweet_decay * tweet.weight
+            post.weight = config.feed_props.post_decay * post.weight
         end
     end
-    deleteat!(this_agent.feed, deleted_tweets)
+    deleteat!(this_agent.feed, deleted_posts)
     sort!(this_agent.feed, lt=<, rev=true)
     if length(this_agent.feed) > config.feed_props.feed_size
         this_agent.feed = this_agent.feed[1:config.feed_props.feed_size]
     end
 
-    for tweet in this_agent.feed
-        tweet.seen = true
+    for post in this_agent.feed
+        if !(agent_idx in post.seen_by)
+            push!(post.seen_by, agent_idx)
+        end
     end
 
     return state

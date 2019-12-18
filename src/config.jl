@@ -60,19 +60,19 @@ function cfg_sim(
 end
 
 """
-    cfg_ot(;[like=0.2, retweet=0.3, backfire=0.4, check_unease=0.3, follow=0.2, unfollow=0.4])
+    cfg_ot(;[like=0.2, share=0.3, backfire=0.4, check_unease=0.3, follow=0.2, unfollow=0.4])
 
 Define thresholds for opinion differences in an agent-based simulation.
 
 # Example
 ```julia-repl
 julia>cfg_ot()
-(like = 0.2, retweet = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4)
+(like = 0.2, share = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4)
 ```
 
 # Arguments
 - `like`: opinion difference threshold for likes
-- `retweet`:  opinion difference threshold for retweets
+- `share`:  opinion difference threshold for shares
 - `backfire`: opinion difference for the backfire effect
 - `check_unease`: opinion difference threshold for lowering check regularity
 - `follow`: opinion difference threshold for follows
@@ -83,15 +83,15 @@ See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ag](@ref), [cfg
 function cfg_ot(
     ;
     like::Float64=0.2,
-    retweet::Float64=0.3,
-    backfire::Float64=0.4,
-    check_unease::Float64=0.3,
-    follow::Float64=0.2,
-    unfollow::Float64=0.4
+    share::Float64=0.3,
+    backfire::Float64=0.5,
+    check_unease::Float64=0.4,
+    follow::Float64=0.3,
+    unfollow::Float64=0.5
 )
     return (
         like=like,
-        retweet=retweet,
+        share=share,
         backfire=backfire,
         check_unease=check_unease,
         follow=follow,
@@ -120,10 +120,10 @@ See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg
 """
 function cfg_ag(
     ;
-    own_opinion_weight::Float64=0.99,
+    own_opinion_weight::Float64=0.95,
     check_decrease::Float64=0.9,
     inclin_interact_lambda::Float64=log(25),
-    unfollow_rate::Float64=0.2,
+    unfollow_rate::Float64=0.05,
     min_input_count::Int64=0
 )
     return (
@@ -136,30 +136,30 @@ function cfg_ag(
 end
 
 """
-    cfg_feed(;[feed_size=10, tweet_decay=0.5])
+    cfg_feed(;[feed_size=10, post_decay=0.5])
 
 Define feed parameters in an agent-based simulation.
 
 # Example
 ```julia-repl
 julia>cfg_feed()
-(feed_size = 10, tweet_decay = 0.5)
+(feed_size = 10, post_decay = 0.5)
 ```
 
 # Arguments
-- `feed_size`: length of tweet feed
-- `tweet_decay`: decay factor for tweets in each tick
+- `feed_size`: length of post feed
+- `post_decay`: decay factor for posts in each tick
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref)
 """
 function cfg_feed(
     ;
-    feed_size::Int64=10,
-    tweet_decay::Float64=0.5
+    feed_size::Int64=15,
+    post_decay::Float64=0.5
 )
     return (
         feed_size=feed_size,
-        tweet_decay=tweet_decay
+        post_decay=post_decay
     )
 end
 
@@ -171,7 +171,7 @@ Provide configuration parameters for an agent-based simulation.
 # Example
 ```julia-repl
 julia>Config()
-Config((agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4), (n_iter = 100, max_inactive_ticks = 2), (like = 0.2, retweet = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4), (own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2), (feed_size = 10, tweet_decay = 0.5))
+Config((agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4), (n_iter = 100, max_inactive_ticks = 2), (like = 0.2, share = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4), (own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2), (feed_size = 10, post_decay = 0.5))
 ```
 
 # Arguments
@@ -193,7 +193,7 @@ struct Config
         NTuple{2,Int64}
     }
     opinion_threshs::NamedTuple{
-        (:like, :retweet, :backfire, :check_unease, :follow, :unfollow),
+        (:like, :share, :backfire, :check_unease, :follow, :unfollow),
         NTuple{6,Float64}
     }
     agent_props::NamedTuple{
@@ -201,7 +201,7 @@ struct Config
         <:Tuple{Float64, Float64, Float64, Float64, Int64}
     }
     feed_props::NamedTuple{
-        (:feed_size, :tweet_decay),
+        (:feed_size, :post_decay),
         <:Tuple{Int64, Float64}
     }
     # constructor
