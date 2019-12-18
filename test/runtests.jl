@@ -5,6 +5,34 @@ using JLD2
 using CSV
 using LightGraphs
 
+batch = Config[]
+for ac in 50:50:200
+    push!(batch,Config(network=cfg_net(agent_count=ac)))
+end
+
+batch
+
+result = simulate(Config(agent_props=cfg_ag(mean_desired_input_count = 200)))
+result[1]
+
+result = load("results/_tmpstate.jld2")[""]
+
+using Statistics
+using LightGraphs
+mean(agent.desired_input_count for agent in result[3][2])
+
+std(indegree(result[3][1]))
+
+ABM4OSN.generate_desired_input_count(100,25)
+
+for i in 1:1000
+    push!(randenn, randn)
+end
+
+using Plots
+plot(randenn)
+histogram(randenn)
+
 sim2 = load("sim500.jld2")
 net_evolution = deepcopy(sim2["sim500"][1][3])
 
