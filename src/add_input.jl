@@ -11,7 +11,7 @@ Create new directed edges from other agents.
 See also: [`Config`](@ref), [`drop_input!`](@ref)
 """
 function add_input!(
-    state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer, tweet_list::AbstractArray,
+    state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer, post_list::AbstractArray,
     config::Config
 )
     graph, agent_list = state
@@ -32,8 +32,9 @@ function add_input!(
             end
         end
 
-        if length(input_candidates) == 0 && indegree(graph, agent_idx) <= config.agent_props.min_input_count
-            set_inactive!(state, agent_idx, tweet_list)
+        if length(input_queue) == 0 && indegree(graph, agent_idx) <= config.agent_props.min_input_count
+            set_inactive!(state, agent_idx, post_list)
+            this_agent.inactive_ticks = -1
             return state
         end
 
