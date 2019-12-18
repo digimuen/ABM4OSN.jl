@@ -10,7 +10,7 @@ net_evolution = deepcopy(sim2["sim500"][1][3])
 
 CSV.write("dataframe.csv", sim2["sim500"][1][1])
 
-
+bla = "bla"
 
 using Plots
 plot(outdegrees, alpha=0.2)
