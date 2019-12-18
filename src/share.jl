@@ -1,7 +1,7 @@
 """
-    retweet(state, agent_idx, config)
+    share(state, agent_idx, config)
 
-Creates a retweet of a tweet
+Creates a share of a post
 
 # Arguments
 - `state`: a tuple of the current graph and agent_list
@@ -9,20 +9,20 @@ Creates a retweet of a tweet
 - `config`: Config object as provided by Config
 See also: [`Config`](@ref), [`Agent`](@ref), [`like!`](@ref)
 """
-function retweet!(
+function share!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
     config::Config
 )
     graph, agent_list = state
     this_agent = agent_list[agent_idx]
-    for tweet in this_agent.feed
-        if ((abs(this_agent.opinion - tweet.opinion) < config.opinion_threshs.retweet)
-            && !(tweet in this_agent.retweeted_tweets))
-            tweet.weight *= 1.01
-            tweet.retweet_count += 1
-            push!(this_agent.retweeted_tweets, tweet)
+    for post in this_agent.feed
+        if ((abs(this_agent.opinion - post.opinion) < config.opinion_threshs.share)
+            && !(post in this_agent.shared_posts))
+            post.weight *= 1.01
+            post.share_count += 1
+            push!(this_agent.shared_posts, post)
             for neighbor in outneighbors(graph, agent_idx)
-                push!(agent_list[neighbor].feed, tweet)
+                push!(agent_list[neighbor].feed, post)
             end
             break
         end

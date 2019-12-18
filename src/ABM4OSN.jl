@@ -21,7 +21,7 @@ module ABM4OSN
 
     # contain structs
     include("config.jl")
-    include("tweet.jl")
+    include("post.jl")
     include("agent.jl")
     include("network.jl")
     include("simulation.jl")
@@ -33,8 +33,8 @@ module ABM4OSN
     include("generate_agent_props.jl")
     include("like.jl")
     include("log_network.jl")
-    include("publish_tweet.jl")
-    include("retweet.jl")
+    include("publish_post.jl")
+    include("share.jl")
     include("set_inactive.jl")
     include("update_check_regularity.jl")
     include("update_feed.jl")
