@@ -43,6 +43,7 @@ module ABM4OSN
 
     # exports for user interaction
     export simulate
+    export simulate_batch
     export Config
     export cfg_ag
     export cfg_feed

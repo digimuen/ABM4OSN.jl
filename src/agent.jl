@@ -22,12 +22,13 @@ mutable struct Agent
     inclin_interact::Float64
     perceiv_publ_opinion::Float64
     check_regularity::Float64
+    desired_input_count::Float64
     active::Bool
     inactive_ticks::Int16
     feed::Array{Post, 1}
     liked_posts::Array{Post, 1}
     shared_posts::Array{Post, 1}
-    function Agent(id, opinion, inclin_interact, check_regularity)
+    function Agent(id, opinion, inclin_interact, check_regularity, desired_input_count)
         # check if opinion value is valid
         if opinion < -1 || opinion > 1
             error("invalid opinion value")
@@ -42,6 +43,7 @@ mutable struct Agent
             inclin_interact,
             opinion,
             check_regularity,
+            desired_input_count,
             true,
             0,
             Array{Post, 1}(undef, 0),

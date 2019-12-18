@@ -36,5 +36,19 @@ function generate_check_regularity()
     return 1 - (rand() / 4)^2
 end
 
+function generate_desired_input_count(mean)
+    # this function was adapted from:
+    # https://www.johndcook.com/julia_rng.html
+    if mean <= 0.0
+        error("Mean must be positive")
+    end
+    stdev = mean/4
+    u1 = rand()
+    u2 = rand()
+    r = sqrt( -2.0*log(u1) )
+    theta = 2.0*pi*u2
+    return mean + stdev*r*sin(theta)
+end
+
 # suppress output of include()
 ;
