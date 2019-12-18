@@ -64,12 +64,13 @@ function update_network!(
     pref_attach_list = [src(e) for e in edges(graph) if agent_list[src(e)].active]
     for _ in 1:config.network.growth_rate
         push!(
-            agent_list, 
+            agent_list,
             Agent(
                 nv(graph) + 1,
                 generate_opinion(),
                 generate_inclin_interact(),
-                generate_check_regularity()
+                generate_check_regularity(),
+                generate_desired_input_count(config.agent_props.mean_desired_input_count)
             )
         )
         add_vertex!(graph)

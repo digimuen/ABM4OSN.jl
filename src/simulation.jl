@@ -26,7 +26,7 @@ function tick!(
             like(state, agent_idx, config)
             share!(state, agent_idx, config)
             drop_input!(state, agent_idx, config)
-            if indegree(state[1], agent_idx) < 120
+            if indegree(state[1], agent_idx) < this_agent.desired_input_count
                 add_input!(state, agent_idx, post_list, config)
             else
                 if rand() < 0.4
@@ -63,10 +63,10 @@ Creates the initial state, performs and logs simulation ticks and returns the co
 See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
 """
 function simulate(
-    config::Config = Config(); batch_desc::String=""
+    config::Config = Config(); batch_desc::String = "result"
 )
     graph = create_network(config.network.agent_count, config.network.m0)
-    init_state = (graph, create_agents(graph))
+    init_state = (graph, create_agents(graph, config))
     state = deepcopy(init_state)
     post_list = Array{Post, 1}(undef, 0)
     graph_list = Array{AbstractGraph, 1}([graph])
@@ -83,24 +83,24 @@ function simulate(
     if !in("tmp", readdir())
         mkdir("tmp")
     end
-    if batch_desc == ""
+    if batch_desc == "result"
         print("Current Tick: 0")
     end
     for i in 1:config.simulation.n_iter
         current_network = deepcopy(state[1])
         rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
-        if batch_desc == ""
+        if batch_desc == "result"
             print('\r')
             print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(current_network)/nv(current_network))) * ", max outdegree: " * string(maximum(outdegree(current_network))) * ", mean outdegree: " * string(mean(outdegree(current_network))) * ", current Posts: " * string(length(post_list)))
         end
         append!(df, tick!(state, post_list, i, config))
         if i % ceil(config.simulation.n_iter / 10) == 0
-            if batch_desc != ""
+            if batch_desc != "result"
                 print(".")
             end
             push!(graph_list, current_network)
 
-            save(joinpath("tmp", batch_desc, "_tmpstate.jld2"), string(i), (string(config), (df, post_list, graph_list), state, init_state))
+            save(joinpath("tmp", batch_desc * "_tmpstate.jld2"), string(i), (string(config), (df, post_list, graph_list), state, init_state))
         end
 
     end
@@ -118,12 +118,22 @@ function simulate(
     if !in("results", readdir())
         mkdir("results")
     end
-    save(joinpath("results", batch_desc, "_tmpstate.jld2"), batch_desc, (string(config), (df, post_df, graph_list), state, init_state))
-    rm(joinpath("tmp", batch_desc, "_tmpstate.jld2"))
+    save(joinpath("results", batch_desc * ".jld2"), batch_desc, (config, (df, post_df, graph_list), state, init_state))
+    rm(joinpath("tmp", batch_desc * "_tmpstate.jld2"))
 
     print("\n---\nFinished simulation run with the following specifications:\n $config\n---\n")
 
-    return (df, post_df, graph_list), state, init_state
+    return config, (df, post_df, graph_list), state, init_state
+end
+
+function simulate_batch(
+    configlist::Array{Config, 1};
+    batch_desc::String = ""
+    )
+
+    for i in 1:length(configlist)
+        simulate(configlist[i], batch_desc = (batch_desc * "_run$i"))
+    end
 end
 
 # suppress output of include()
