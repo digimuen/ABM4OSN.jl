@@ -136,5 +136,59 @@ function simulate_batch(
     end
 end
 
+function simulate_resume(
+    tempresult::Dict{String, Any},
+    batch_desc::String = ""
+    )
+    
+    tick_nr = keys(tempresult)[1]
+    config, (df, post_list, graph_list), state, init_state = collect(values(tempresult))[1]
+
+    if !in("tmp", readdir())
+        mkdir("tmp")
+    end
+    if batch_desc == "result"
+        print("Current Tick: 0")
+    end
+    for i in tick_nr:config.simulation.n_iter
+        current_network = deepcopy(state[1])
+        rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
+        if batch_desc == "result"
+            print('\r')
+            print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(current_network)/nv(current_network))) * ", max outdegree: " * string(maximum(outdegree(current_network))) * ", mean outdegree: " * string(mean(outdegree(current_network))) * ", current Posts: " * string(length(post_list)))
+        end
+        append!(df, tick!(state, post_list, i, config))
+        if i % ceil(config.simulation.n_iter / 10) == 0
+            if batch_desc != "result"
+                print(".")
+            end
+            push!(graph_list, current_network)
+
+            save(joinpath("tmp", batch_desc * "_tmpstate2.jld2"), string(i), (string(config), (df, post_list, graph_list), state, init_state))
+        end
+
+    end
+
+    post_df = DataFrame(
+        Opinion = [p.opinion for p in post_list],
+        Weight = [p.weight for p in post_list],
+        Source_Agent = [p.source_agent for p in post_list],
+        Published_At = [p.published_at for p in post_list],
+        Seen = [p.seen_by for p in post_list],
+        Likes = [p.like_count for p in post_list],
+        Reposts = [p.share_count for p in post_list]
+    )
+
+    if !in("results", readdir())
+        mkdir("results")
+    end
+    save(joinpath("results", batch_desc * ".jld2"), batch_desc, (config, (df, post_df, graph_list), state, init_state))
+    rm(joinpath("tmp", batch_desc * "_tmpstate2.jld2"))
+
+    print("\n---\nFinished simulation run with the following specifications:\n $config\n---\n")
+
+    return config, (df, post_df, graph_list), state, init_state
+end
+
 # suppress output of include()
 ;
