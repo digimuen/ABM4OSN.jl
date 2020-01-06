@@ -75,9 +75,12 @@ function simulate(
         AgentID = Int64[],
         Opinion = Float64[],
         PerceivPublOpinion = Float64[],
+        CheckRegularity = Float64[],
         InclinInteract = Float64[],
+        DesiredInputCount = Float64[],
         InactiveTicks = Int64[],
-        Indegree = Float64[],
+        Indegree = Int64[],
+        Outdegree = Int64[],
         ActiveState = Bool[]
     )
     if !in("tmp", readdir())

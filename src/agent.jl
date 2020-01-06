@@ -5,16 +5,18 @@ Provide data structure for agents within agent-based simulation.
 
 # Examples
 ```julia-repl
-julia>Agent(0, 0, 0)
-Agent(0.0, 0.0 , 0.0, 0.0, true, 0, Post[], Post[], Post[])
+julia>Agent(0, 0, 0, 0, 0)
+Agent(0, 0.0, 0.0 , 0.0, 0.0, 0.0, true, 0, Post[], Post[], Post[])
 ```
 
 # Arguments
+- `id`: agent identifier within simulation
 - `opinion`: opinion value between -1 and 1
 - `inclin_interact`: value for inclination to interact between 0 and 1
 - `check_regularity`: value for check regularity between 0 and 1
+- `desired_input_count`: how many other agents an agent ideally wants to follow
 
-See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@ref), [generate_check_regularity](@ref)
+See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@ref), [generate_check_regularity](@ref), [generate_desired_input_count](@ref)
 """
 mutable struct Agent
     id::Int64
