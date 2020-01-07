@@ -118,7 +118,7 @@ function simulate(
         Published_At = [p.published_at for p in post_list],
         Seen = [p.seen_by for p in post_list],
         Likes = [p.like_count for p in post_list],
-        Dislikes = [p.dislike_count for p in post_list]
+        Dislikes = [p.dislike_count for p in post_list],
         Reposts = [p.share_count for p in post_list]
     )
 
@@ -147,7 +147,7 @@ function simulate_resume(
     tempresult::Dict{String, Any},
     batch_desc::String = ""
     )
-    
+
     tick_nr = keys(tempresult)[1]
     config, (df, post_list, graph_list), state, init_state = collect(values(tempresult))[1]
 

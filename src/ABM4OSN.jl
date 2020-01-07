@@ -55,5 +55,6 @@ module ABM4OSN
     export cfg_net
     export cfg_ot
     export cfg_sim
+    export cfg_mech
 
 end # module
