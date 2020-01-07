@@ -17,9 +17,10 @@ function share!(
     this_agent = agent_list[agent_idx]
     for post in this_agent.feed
         if ((abs(this_agent.opinion - post.opinion) < config.opinion_threshs.share)
-            && !(post in this_agent.shared_posts))
-            post.weight *= 1.01
+            && !(post in this_agent.shared_posts)
+            && !(post in this_agent.disliked_posts))
             post.share_count += 1
+            post.weight *= 1.01
             push!(this_agent.shared_posts, post)
             for neighbor in outneighbors(graph, agent_idx)
                 push!(agent_list[neighbor].feed, post)

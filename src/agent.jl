@@ -29,6 +29,7 @@ mutable struct Agent
     inactive_ticks::Int16
     feed::Array{Post, 1}
     liked_posts::Array{Post, 1}
+    disliked_posts::Array{Post, 1}
     shared_posts::Array{Post, 1}
     function Agent(id, opinion, inclin_interact, check_regularity, desired_input_count)
         # check if opinion value is valid
@@ -48,6 +49,7 @@ mutable struct Agent
             desired_input_count,
             true,
             0,
+            Array{Post, 1}(undef, 0),
             Array{Post, 1}(undef, 0),
             Array{Post, 1}(undef, 0),
             Array{Post, 1}(undef, 0)

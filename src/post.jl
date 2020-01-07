@@ -24,6 +24,7 @@ mutable struct Post
     published_at::Int64
     seen_by::Array{Int64, 1}
     like_count::Int64
+    dislike_count::Int64
     share_count::Int64
     function Post(opinion, weight, source_agent, published_at)
         # check if opinion value is valid
@@ -39,6 +40,7 @@ mutable struct Post
             source_agent,
             published_at,
             Int64[],
+            0,
             0,
             0
         )

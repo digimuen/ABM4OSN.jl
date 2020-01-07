@@ -44,7 +44,6 @@ function add_input!(
         shuffle!(input_candidates)
         # order neighbors by frequency of occurence in input_candidates descending
         input_queue = first.(sort(collect(countmap(input_candidates)), by=last, rev=true))
-        # add edges
     end
 
     if (length(input_queue) - config.network.new_follows) < 0
@@ -56,7 +55,8 @@ function add_input!(
         new_neighbor = popfirst!(input_queue)
         add_edge!(graph, new_neighbor, agent_idx)
         if (abs(this_agent.opinion - agent_list[new_neighbor].opinion) < config.opinion_threshs.follow
-            && indegree(graph, agent_idx) > indegree(graph, new_neighbor))
+            && outdegree(graph, agent_idx) > outdegree(graph, new_neighbor)
+            && rand() < 0.5)
             add_edge!(graph, agent_idx, new_neighbor)
         end
     end
