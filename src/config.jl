@@ -166,13 +166,13 @@ function cfg_feed(
 end
 
 """
-    cfg_mechanics(;[like=true, dislike=true, share=true])
+    cfg_mech(;[like=true, dislike=true, share=true])
 
 Define mechanics of the social network in an agent-based simulation.
 
 # Example
 ```julia-repl
-julia>cfg_mechanics()
+julia>cfg_mech()
 (like = true, dislike = true, share = true)
 ```
 
@@ -183,7 +183,7 @@ julia>cfg_mechanics()
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref)
 """
-function cfg_mechanics(
+function cfg_mech(
     ;
     like::Bool=true,
     dislike::Bool=true,
@@ -249,7 +249,7 @@ struct Config
         opinion_threshs = cfg_ot(),
         agent_props = cfg_ag(),
         feed_props = cfg_feed(),
-        mechanics = cfg_mechanics()
+        mechanics = cfg_mech()
     )
         new(network, simulation, opinion_threshs, agent_props, feed_props, mechanics)
     end
