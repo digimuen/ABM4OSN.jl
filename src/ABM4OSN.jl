@@ -31,6 +31,7 @@ module ABM4OSN
     # contain functions
     include("add_input.jl")
     include("create_agents.jl")
+    include("dislike.jl")
     include("drop_input.jl")
     include("generate_agent_props.jl")
     include("like.jl")

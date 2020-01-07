@@ -1,7 +1,7 @@
 """
     like(state, agent_idx, config)
 
-Generate a like for a post.
+Generate a dislike for a post.
 
 # Arguments
 - `state`: a tuple of the current graph and agent_list
@@ -10,7 +10,7 @@ Generate a like for a post.
 
 See also: [`Config`](@ref), [`Agent`](@ref)
 """
-function like!(
+function dislike!(
     state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
     config::Config
 )
@@ -18,12 +18,13 @@ function like!(
     this_agent = agent_list[agent_idx]
 
     for post in this_agent.feed
-        if ((abs(post.opinion - this_agent.opinion) < config.opinion_threshs.like)
+        if ((abs(post.opinion - this_agent.opinion) > (2 * (config.opinion_threshs.like)))
             && !(post in this_agent.liked_posts)
-            && !(post in this_agent.disliked_posts))
-            post.like_count += 1
-            post.weight *= 1.01
-            push!(this_agent.liked_posts, post)
+            && !(post in this_agent.disliked_posts)
+            && !(post in this_agent.shared_posts))
+            post.dislike_count += 1
+            post.weight *= 0.99
+            push!(this_agent.disliked_posts, post)
         end
     end
     return state

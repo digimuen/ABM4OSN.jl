@@ -166,6 +166,37 @@ function cfg_feed(
 end
 
 """
+    cfg_mechanics(;[like=true, dislike=true, share=true])
+
+Define mechanics of the social network in an agent-based simulation.
+
+# Example
+```julia-repl
+julia>cfg_mechanics()
+(like = true, dislike = true, share = true)
+```
+
+# Arguments
+- `like`: whether or not to include functionality 'like'
+- `dislike`: whether or not to include functionality 'dislike'
+- `share`: whether or not to include functionality 'share'
+
+See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref)
+"""
+function cfg_mechanics(
+    ;
+    like::Bool=true,
+    dislike::Bool=true,
+    share::Bool=true
+)
+    return (
+        like=like,
+        dislike=dislike,
+        share=share
+    )
+end
+
+"""
     Config(;[network=cfg_net(), simulation=cfg_sim(), opinion_threshs=cfg_ot(), agent_props=cfg_ag(), feed_props=cfg_feed()])
 
 Provide configuration parameters for an agent-based simulation.
@@ -183,7 +214,7 @@ Config((agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4), (n_iter =
 - `agent_props`: tuple of agent parameters as created by cfg_ag
 - `feed_props`: tuple of feed parameters as created by cfg_feed
 
-See also: [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref)
+See also: [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref), [cfg_mechanics](@ref)
 """
 struct Config
     network::NamedTuple{
@@ -206,6 +237,10 @@ struct Config
         (:feed_size, :post_decay),
         <:Tuple{Int64, Float64}
     }
+    mechanics::NamedTuple{
+        (:like, :dislike, :share),
+        NTuple{3,Bool}
+    }
     # constructor
     function Config(
         ;
@@ -213,9 +248,10 @@ struct Config
         simulation = cfg_sim(),
         opinion_threshs = cfg_ot(),
         agent_props = cfg_ag(),
-        feed_props = cfg_feed()
+        feed_props = cfg_feed(),
+        mechanics = cfg_mechanics()
     )
-        new(network, simulation, opinion_threshs, agent_props, feed_props)
+        new(network, simulation, opinion_threshs, agent_props, feed_props, mechanics)
     end
 end
 

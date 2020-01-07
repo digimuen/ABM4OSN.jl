@@ -23,15 +23,18 @@ function tick!(
             update_feed!(state, agent_idx, config)
             update_perceiv_publ_opinion!(state, agent_idx)
             update_opinion!(state, agent_idx, config)
-            like(state, agent_idx, config)
-            share!(state, agent_idx, config)
+            if config.mechanics.like
+                like!(state, agent_idx, config)
+            end
+            if config.mechanics.dislike
+                dislike!(state, agent_idx, config)
+            end
+            if config.mechanics.share
+                share!(state, agent_idx, config)
+            end
             drop_input!(state, agent_idx, config)
             if indegree(state[1], agent_idx) < this_agent.desired_input_count
                 add_input!(state, agent_idx, post_list, config)
-            else
-                if rand() < 0.4
-                    add_input!(state, agent_idx, post_list, Config(network=cfg_net(new_follows = 1)))
-                end
             end
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
@@ -115,6 +118,7 @@ function simulate(
         Published_At = [p.published_at for p in post_list],
         Seen = [p.seen_by for p in post_list],
         Likes = [p.like_count for p in post_list],
+        Dislikes = [p.dislike_count for p in post_list]
         Reposts = [p.share_count for p in post_list]
     )
 

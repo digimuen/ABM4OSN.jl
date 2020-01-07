@@ -3,10 +3,13 @@ using ABM4OSN
 
 @safetestset "ABM4OSN Tests" begin
     @safetestset "Network Tests" begin
-        include(Base.Filesystem.joinpath("test", "network_tests.jl"))
+        include(joinpath("test", "network_tests.jl"))
     end
     @safetestset "Property Function Tests" begin
-        include(Base.Filesystem.joinpath("test", "property_function_tests.jl"))
+        include(joinpath("test", "property_function_tests.jl"))
+    end
+    @safetestset "Post Tests" begin
+        include(joinpath("test", "post_tests.jl"))
     end
 end
 
