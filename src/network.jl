@@ -72,7 +72,6 @@ function update_network!(
     graph, agent_list = state
     pref_attach_list = [src(e) for e in edges(graph) if agent_list[src(e)].active]
     for _ in 1:config.network.growth_rate
-        shuffle!(pref_attach_list)
         push!(
             agent_list,
             Agent(
@@ -86,11 +85,12 @@ function update_network!(
         add_vertex!(graph)
         targets = Array{Int64}(undef, 0)
 
+        shuffle!(pref_attach_list)
         for i in pref_attach_list
             if !(i in targets) && i != nv(graph)
                 push!(targets, i)
             end
-            if length(targets) == last(agent_list).desired_input_count / 2
+            if length(targets) == trunc(Int, last(agent_list).desired_input_count / 2)
                 break
             end
         end
