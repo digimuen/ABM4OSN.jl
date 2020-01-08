@@ -47,7 +47,7 @@ function generate_desired_input_count(mean)
     u2 = rand()
     r = sqrt( -2.0*log(u1) )
     theta = 2.0*pi*u2
-    return mean + stdev*r*sin(theta)
+    return trunc(Int, mean + stdev*r*sin(theta))
 end
 
 # suppress output of include()
