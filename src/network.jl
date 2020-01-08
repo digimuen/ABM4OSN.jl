@@ -90,7 +90,7 @@ function update_network!(
             if !(i in targets) && i != nv(graph)
                 push!(targets, i)
             end
-            if length(targets) == trunc(Int, last(agent_list).desired_input_count / 2)
+            if length(targets) == ceil(Int, last(agent_list).desired_input_count / 2)
                 break
             end
         end

@@ -172,7 +172,7 @@ Define mechanics of the social network in an agent-based simulation.
 # Example
 ```julia-repl
 julia>cfg_mech()
-(like = true, dislike = true, share = true)
+(like = true, dislike = false, share = true)
 ```
 
 # Arguments
@@ -185,7 +185,7 @@ See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg
 function cfg_mech(
     ;
     like::Bool=true,
-    dislike::Bool=true,
+    dislike::Bool=false,
     share::Bool=true
 )
     return (
