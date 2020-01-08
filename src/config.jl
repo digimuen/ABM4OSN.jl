@@ -1,17 +1,16 @@
 """
-    cfg_net(;[agent_count=100, m0=10, growth_rate=4, new_follows=4])
+    cfg_net(;[agent_count=1000, growth_rate=4, new_follows=4])
 
 Define configuration parameters for the network in an agent-based simulation.
 
 # Example
 ```julia-repl
 julia>cfg_net()
-(agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4)
+(agent_count = 1000, growth_rate = 4, new_follows = 4)
 ```
 
 # Arguments
 - `agent_count`: how many agents the simulation
-- `m0`: m0 parameter for Barabási-Albert model
 - `growth_rate`: how many agents to add each tick
 - `new_follows`: how many new agent an agent follows each tick
 
@@ -19,14 +18,13 @@ See also: [Config](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_
 """
 function cfg_net(
     ;
-    agent_count::Int64=100,
-    m0::Int64=10,
+    agent_count::Int64=1000,
     growth_rate::Int64=4,
     new_follows::Int64=4
 )
     return (
         agent_count=agent_count,
-        m0=m0,growth_rate=growth_rate,
+        growth_rate=growth_rate,
         new_follows=new_follows
     )
 end
@@ -100,14 +98,14 @@ function cfg_ot(
 end
 
 """
-    cfg_ag(;[own_opinion_weight=0.99, check_decrease=0.9, inclin_interact_lambda=log(25), unfollow_rate=0.2])
+    cfg_ag(;[own_opinion_weight=0.99, check_decrease=0.9, inclin_interact_lambda=log(25), unfollow_rate=0.2, mean_desired_input_count=100])
 
 Define agent parameters in an agent-based simulation.
 
 # Example
 ```julia-repl
 julia>cfg_ag()
-(own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2)
+(own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2, mean_desired_input_count = 100)
 ```
 
 # Arguments
@@ -115,6 +113,7 @@ julia>cfg_ag()
 - `check_decrease`: decrease factor for check regularity
 - `inclin_interact_lambda`: lambda for exponential distribution for inclination to interact
 - `unfollow_rate`: fraction of agents to unfollow each tick
+- `mean_desired_input_count`: Mean of desired input count over all agents
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_feed](@ref)
 """
@@ -204,7 +203,7 @@ Provide configuration parameters for an agent-based simulation.
 # Example
 ```julia-repl
 julia>Config()
-Config((agent_count = 100, m0 = 10, growth_rate = 4, new_follows = 4), (n_iter = 100, max_inactive_ticks = 2), (like = 0.2, share = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4), (own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2), (feed_size = 10, post_decay = 0.5))
+Config((agent_count = 1000, growth_rate = 4, new_follows = 4), (n_iter = 100, max_inactive_ticks = 2), (like = 0.2, share = 0.3, backfire = 0.4, check_unease = 0.3, follow = 0.2, unfollow = 0.4), (own_opinion_weight = 0.99, check_decrease = 0.9, inclin_interact_lambda = 3.2188758248682006, unfollow_rate = 0.2), (feed_size = 10, post_decay = 0.5))
 ```
 
 # Arguments
@@ -218,8 +217,8 @@ See also: [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg
 """
 struct Config
     network::NamedTuple{
-        (:agent_count, :m0, :growth_rate, :new_follows),
-        NTuple{4,Int64}
+        (:agent_count, :growth_rate, :new_follows),
+        NTuple{3,Int64}
     }
     simulation::NamedTuple{
         (:n_iter, :max_inactive_ticks),

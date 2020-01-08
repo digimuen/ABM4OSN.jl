@@ -68,11 +68,11 @@ See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
 function simulate(
     config::Config = Config(); batch_desc::String = "result"
 )
-    graph = create_network(config.network.agent_count, config.network.m0)
-    init_state = (graph, create_agents(graph, config))
+    agent_list = create_agents(config)
+    init_state = (create_network(agent_list, config), agent_list)
     state = deepcopy(init_state)
     post_list = Array{Post, 1}(undef, 0)
-    graph_list = Array{AbstractGraph, 1}([graph])
+    graph_list = Array{AbstractGraph, 1}([init_state[1]])
     df = DataFrame(
         TickNr = Int64[],
         AgentID = Int64[],
@@ -80,7 +80,7 @@ function simulate(
         PerceivPublOpinion = Float64[],
         CheckRegularity = Float64[],
         InclinInteract = Float64[],
-        DesiredInputCount = Float64[],
+        DesiredInputCount = Int64[],
         InactiveTicks = Int64[],
         Indegree = Int64[],
         Outdegree = Int64[],

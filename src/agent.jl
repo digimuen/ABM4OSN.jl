@@ -24,7 +24,7 @@ mutable struct Agent
     inclin_interact::Float64
     perceiv_publ_opinion::Float64
     check_regularity::Float64
-    desired_input_count::Float64
+    desired_input_count::Int64
     active::Bool
     inactive_ticks::Int16
     feed::Array{Post, 1}

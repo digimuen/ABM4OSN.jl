@@ -4,8 +4,7 @@
 Create a network with the Barabási-Albert model.
 
 # Arguments
-- `n`: number of nodes
-- `m0`: m0 parameter for Barabási-Albert model
+- `config`: Config file
 
 # Example
 ```julia-repl
@@ -13,7 +12,7 @@ julia> using Random
 
 julia> Random.seed!(0);
 
-julia> create_network(100, 3)
+julia> create_network(Config())
 {100, 206} directed simple Int64 graph
 
 ```
@@ -21,28 +20,38 @@ julia> create_network(100, 3)
 See also: [`update_network!`](@ref)
 """
 function create_network(
-    n::Int64, m0::Int64
+    agent_list, config
 )
     # this algorithm is modelled after the python networkx implementation:
     # https://github.com/networkx/networkx/blob/master/networkx/generators/random_graphs.py#L655
-    if n >= m0  # check if n is smaller than m0
-        g = SimpleDiGraph(n)
-        targets = collect(1:m0)  # set of nodes to connect to
-        repeated_nodes = Array{Int64}(undef, 0)  # growing set of nodes for preferential attachment
-        source = m0 + 1  # initial source node
-        # preferential attachment algorithm
-        while source <= n
-            for e in zip(targets, fill(source, m0))
-                add_edge!(g, e[1], e[2])
-            end
-            append!(repeated_nodes, targets)
-            targets = shuffle(repeated_nodes)[1:m0]
-            source += 1
+
+    g = SimpleDiGraph(config.network.agent_count)
+    pref_attach_list = collect(1:config.network.agent_count)
+
+    for source in 1:config.network.agent_count
+        shuffle!(pref_attach_list)
+        m0 = agent_list[source].desired_input_count
+        if m0 >= config.network.agent_count
+            m0 = config.network.agent_count -1
         end
-        return g
-    else
-        error("n cannot be smaller than m0")
+        targets = Array{Int64}(undef, 0)
+
+        for i in pref_attach_list
+            if !(i in targets) && i != source
+                push!(targets, i)
+            end
+            if length(targets) == m0
+                break
+            end
+        end
+
+        for e in zip(targets, fill(source, m0))
+            add_edge!(g, e[1], e[2])
+        end
+        append!(pref_attach_list, targets)
     end
+
+    return g
 end
 
 """
@@ -63,6 +72,7 @@ function update_network!(
     graph, agent_list = state
     pref_attach_list = [src(e) for e in edges(graph) if agent_list[src(e)].active]
     for _ in 1:config.network.growth_rate
+        shuffle!(pref_attach_list)
         push!(
             agent_list,
             Agent(
@@ -74,11 +84,22 @@ function update_network!(
             )
         )
         add_vertex!(graph)
-        shuffle!(pref_attach_list)
-        for i in 1:config.network.m0
-            add_edge!(graph, nv(graph), pref_attach_list[i])
+        targets = Array{Int64}(undef, 0)
+
+        for i in pref_attach_list
+            if !(i in targets) && i != nv(graph)
+                push!(targets, i)
+            end
+            if length(targets) == last(agent_list).desired_input_count / 2
+                break
+            end
+        end
+
+        for t in targets
+            add_edge!(graph, t, nv(graph))
         end
     end
+    return state
 end
 
 # suppress output of include()
