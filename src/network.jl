@@ -32,16 +32,18 @@ function create_network(
         shuffle!(pref_attach_list)
         m0 = agent_list[source].desired_input_count
         if m0 >= config.network.agent_count
-            m0 = config.network.agent_count -1
+            m0 = config.network.agent_count - 1
+        elseif m0 <= 0
+            break
         end
         targets = Array{Int64}(undef, 0)
 
         for i in pref_attach_list
+            if length(targets) >= m0
+                break
+            end
             if !(i in targets) && i != source
                 push!(targets, i)
-            end
-            if length(targets) == m0
-                break
             end
         end
 
