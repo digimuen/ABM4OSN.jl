@@ -19,7 +19,7 @@ function update_feed!(
     unique!(this_agent.feed)
     deleted_posts = Integer[]
     for (index, post) in enumerate(this_agent.feed)
-        if post.weight == -1 || !(post.source_agent in inneighbors(graph, agent_idx))
+        if post.weight == -1 || !(post.source_agent in inneighbors(graph, agent_idx)) && post.share_count == 0
             push!(deleted_posts, index)
         else
             post.weight = config.feed_props.post_decay * post.weight
