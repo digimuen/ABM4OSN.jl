@@ -15,7 +15,7 @@ function update_perceiv_publ_opinion!(
     graph, agent_list = state
     this_agent = agent_list[agent_idx]
     # get neighborhood opinion as baseline
-    input = outneighbors(graph, agent_idx)
+    input = inneighbors(graph, agent_idx)
     if length(input) != 0
         input_opinion_mean = mean([agent_list[input_agent].opinion for input_agent in input])
     else
