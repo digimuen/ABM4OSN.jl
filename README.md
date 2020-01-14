@@ -16,12 +16,14 @@ You can run a simple default simulation as follows:
 
 ```
 using ABM4OSN
-run!(Simulation())
+run!()
 ```
 
-The `run!` function creates a temporary directory where the current state of the simulation is saved every 10 % of the simulation. If the simulation is interrupted at any point, the simulation can be resumed by executing:  
+The `run!` function creates a temporary directory where the current state of the simulation is saved every 10 % of the simulation. If the simulation is interrupted at any point, it can be resumed by executing:  
 
-`julia>run_resume!("<path/to/tmp_file>")`
+```
+run_resume!("<path/to/tmp_file>")
+```
 
 After the simulation is finished, `run!` will write the results into a newly created directory *results*.
 
