@@ -18,7 +18,7 @@ See also: [Config](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_
 """
 function cfg_net(
     ;
-    agent_count::Int64=1000,
+    agent_count::Int64=100,
     growth_rate::Int64=4,
     new_follows::Int64=4
 )

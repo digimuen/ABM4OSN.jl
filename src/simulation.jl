@@ -1,3 +1,24 @@
+mutable struct Simulation
+    config::Config
+    init_state::Any
+    final_state::Any
+    agent_log::DataFrame
+    post_log::Any
+    graph_list::Array{AbstractGraph}
+
+    function Simulation(config=Config())
+        new(
+            config,
+            (nothing, nothing),
+            (nothing, nothing),
+            DataFrame(),
+            DataFrame(),
+            Array{AbstractGraph, 1}(undef, 0)
+        )
+    end
+end
+
+
 """
     tick!(state, post_list, tick_nr, config)
 
@@ -32,10 +53,11 @@ function tick!(
             if config.mechanics.share
                 share!(state, agent_idx, config)
             end
-            drop_input!(state, agent_idx, config)
-            if indegree(state[1], agent_idx) < this_agent.desired_input_count
-                add_input!(state, agent_idx, post_list, config)
-            end
+            # drop_input!(state, agent_idx, config)
+            # if indegree(state[1], agent_idx) < this_agent.desired_input_count
+            #     add_input!(state, agent_idx, post_list, config)
+            # end
+            update_input!(state, agent_idx, config)
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
                 if rand() < inclin_interact
@@ -68,15 +90,15 @@ Creates the initial state, performs and logs simulation ticks and returns the co
 
 See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
 """
-function simulate(
-    config::Config = Config(); batch_desc::String = "result"
+function run!(
+    simulation::Simulation=Simulation(); batch_desc::String = "_"
 )
-    agent_list = create_agents(config)
-    init_state = (create_network(agent_list, config), agent_list)
-    state = deepcopy(init_state)
-    post_list = Array{Post, 1}(undef, 0)
-    graph_list = Array{AbstractGraph, 1}([init_state[1]])
-    df = DataFrame(
+    agent_list = create_agents(simulation.config)
+    simulation.init_state = (create_network(agent_list, simulation.config), agent_list)
+    state = deepcopy(simulation.init_state)
+    post_log = Array{Post, 1}(undef, 0)
+    simulation.graph_list = Array{AbstractGraph, 1}([simulation.init_state[1]])
+    agent_log = DataFrame(
         TickNr = Int64[],
         AgentID = Int64[],
         Opinion = Float64[],
@@ -89,115 +111,130 @@ function simulate(
         Outdegree = Int64[],
         ActiveState = Bool[]
     )
-    if !in("tmp", readdir())
+    if !("tmp" in readdir())
         mkdir("tmp")
     end
-    if batch_desc == "result"
-        print("Current Tick: 0")
-    end
-    for i in 1:config.simulation.n_iter
-        current_network = deepcopy(state[1])
-        rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
-        if batch_desc == "result"
-            print('\r')
-            print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(current_network)/nv(current_network))) * ", max outdegree: " * string(maximum(outdegree(current_network))) * ", mean outdegree: " * string(mean(outdegree(current_network))) * ", current Posts: " * string(length(post_list)))
-        end
-        append!(df, tick!(state, post_list, i, config))
-        if i % ceil(config.simulation.n_iter / 10) == 0
-            if batch_desc != "result"
-                print(".")
-            end
-            push!(graph_list, current_network)
 
-            save(joinpath("tmp", batch_desc * "_tmpstate.jld2"), string(i), (string(config), (df, post_list, graph_list), state, init_state))
+    for i in 1:simulation.config.simulation.n_iter
+
+        append!(agent_log, tick!(state, post_log, i, simulation.config))
+        if i % ceil(simulation.config.simulation.n_iter / 10) == 0
+            print(".")
+            current_network = deepcopy(state[1])
+            rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
+            push!(simulation.graph_list, current_network)
+
+            simulation.final_state = state
+            simulation.agent_log = agent_log
+            simulation.post_log = post_log
+
+            save(joinpath("tmp", batch_desc * ".jld2"), string(i), simulation)
         end
 
     end
 
-    post_df = DataFrame(
-        Opinion = [p.opinion for p in post_list],
-        Weight = [p.weight for p in post_list],
-        Source_Agent = [p.source_agent for p in post_list],
-        Published_At = [p.published_at for p in post_list],
-        Seen = [p.seen_by for p in post_list],
-        Likes = [p.like_count for p in post_list],
-        Dislikes = [p.dislike_count for p in post_list],
-        Reposts = [p.share_count for p in post_list]
+    simulation.final_state = state
+    simulation.agent_log = agent_log
+    simulation.post_log = DataFrame(
+        Opinion = [p.opinion for p in post_log],
+        Weight = [p.weight for p in post_log],
+        Source_Agent = [p.source_agent for p in post_log],
+        Published_At = [p.published_at for p in post_log],
+        Seen = [p.seen_by for p in post_log],
+        Likes = [p.like_count for p in post_log],
+        Dislikes = [p.dislike_count for p in post_log],
+        Reposts = [p.share_count for p in post_log]
     )
 
-    if !in("results", readdir())
+    if !("results" in readdir())
         mkdir("results")
     end
-    save(joinpath("results", batch_desc * ".jld2"), batch_desc, (config, (df, post_df, graph_list), state, init_state))
-    rm(joinpath("tmp", batch_desc * "_tmpstate.jld2"))
+    save(joinpath("results", batch_desc * ".jld2"), batch_desc, simulation)
+    rm(joinpath("tmp", batch_desc * ".jld2"))
+    if length(readdir("tmp")) == 0
+        rm("tmp")
+    end
 
-    print("\n---\nFinished simulation run with the following specifications:\n $config\n---\n")
+    print("\n---\nFinished simulation run with the following specifications:\n $(simulation.config)\n---\n")
 
-    return config, (df, post_df, graph_list), state, init_state
+    return simulation
 end
 
-function simulate_batch(
+function run_batch(
     configlist::Array{Config, 1};
     batch_desc::String = ""
     )
 
     for i in 1:length(configlist)
-        simulate(configlist[i], batch_desc = (batch_desc * "_run$i"))
+        run!(Simulation(configlist[i]), batch_desc = (batch_desc * "_run$i"))
     end
 end
 
-function simulate_resume(
-    tempresult::Dict{String, Any},
-    batch_desc::String = ""
+function run_resume!(
+    path::String = "_"
     )
 
-    tick_nr = keys(tempresult)[1]
-    config, (df, post_list, graph_list), state, init_state = collect(values(tempresult))[1]
-
-    if !in("tmp", readdir())
+    if !("tmp" in readdir())
         mkdir("tmp")
+    elseif "tmp" in readdir() && path == "_"
+        path = joinpath("tmp", readdir("tmp")[1])
     end
-    if batch_desc == "result"
-        print("Current Tick: 0")
-    end
-    for i in tick_nr:config.simulation.n_iter
-        current_network = deepcopy(state[1])
-        rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
-        if batch_desc == "result"
-            print('\r')
-            print("Current Tick: $i, current AVG agents connection count::" * string(round(ne(current_network)/nv(current_network))) * ", max outdegree: " * string(maximum(outdegree(current_network))) * ", mean outdegree: " * string(mean(outdegree(current_network))) * ", current Posts: " * string(length(post_list)))
+
+    tempresult = load(path)
+    batch_desc = path[first(findlast("\\", path))+1:first(findfirst(".jld2", path))-1]
+
+    tick_nr = parse(Int, first(keys(tempresult))) + 1
+    simulation = collect(values(tempresult))[1]
+
+    state = simulation.final_state
+    agent_log = simulation.agent_log
+    post_log = simulation.post_log
+
+    for i in tick_nr:simulation.config.simulation.n_iter
+
+        append!(agent_log, tick!(state, post_log, i, simulation.config))
+        if i % ceil(simulation.config.simulation.n_iter / 10) == 0
+            print(".")
+            current_network = deepcopy(state[1])
+            rem_vertices!(current_network, [agent.id for agent in state[2] if !agent.active])
+            push!(simulation.graph_list, current_network)
+
+            simulation.final_state = state
+            simulation.agent_log = agent_log
+            simulation.post_log = post_log
+
+            save(joinpath("tmp", batch_desc * ".jld2"), string(i), simulation)
         end
-        append!(df, tick!(state, post_list, i, config))
-        if i % ceil(config.simulation.n_iter / 10) == 0
-            if batch_desc != "result"
-                print(".")
-            end
-            push!(graph_list, current_network)
-
-            save(joinpath("tmp", batch_desc * "_tmpstate2.jld2"), string(i), (string(config), (df, post_list, graph_list), state, init_state))
-        end
 
     end
 
-    post_df = DataFrame(
-        Opinion = [p.opinion for p in post_list],
-        Weight = [p.weight for p in post_list],
-        Source_Agent = [p.source_agent for p in post_list],
-        Published_At = [p.published_at for p in post_list],
-        Seen = [p.seen_by for p in post_list],
-        Likes = [p.like_count for p in post_list],
-        Reposts = [p.share_count for p in post_list]
+    simulation.final_state = state
+    simulation.agent_log = agent_log
+    simulation.post_log = DataFrame(
+        Opinion = [p.opinion for p in post_log],
+        Weight = [p.weight for p in post_log],
+        Source_Agent = [p.source_agent for p in post_log],
+        Published_At = [p.published_at for p in post_log],
+        Seen = [p.seen_by for p in post_log],
+        Likes = [p.like_count for p in post_log],
+        Dislikes = [p.dislike_count for p in post_log],
+        Reposts = [p.share_count for p in post_log]
     )
 
     if !in("results", readdir())
         mkdir("results")
     end
-    save(joinpath("results", batch_desc * ".jld2"), batch_desc, (config, (df, post_df, graph_list), state, init_state))
-    rm(joinpath("tmp", batch_desc * "_tmpstate2.jld2"))
+    save(joinpath("results", batch_desc * ".jld2"), batch_desc, simulation)
+    rm(joinpath("tmp", batch_desc * ".jld2"))
 
-    print("\n---\nFinished simulation run with the following specifications:\n $config\n---\n")
+    if length(readdir("tmp")) == 0
+        rm("tmp")
+    end
 
-    return config, (df, post_df, graph_list), state, init_state
+    print("\n---\nFinished simulation run with the following specifications:\n $(simulation.config)\n---\n")
+
+    return simulation
+
 end
 
 # suppress output of include()

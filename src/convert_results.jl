@@ -11,11 +11,11 @@ function convert_results(;specificrun::String="")
                         mkdir(joinpath("dataexchange", filename))
                 end
 
-                CSV.write(joinpath("dataexchange", filename, "sim_df" * ".csv"), data[2][1])
-                CSV.write(joinpath("dataexchange", filename, "post_df" * ".csv"), data[2][2])
+                CSV.write(joinpath("dataexchange", filename, "agent_log" * ".csv"), data.agent_log)
+                CSV.write(joinpath("dataexchange", filename, "post_log" * ".csv"), data.post_log)
 
-                for i in 1:length(data[2][3])
-                        savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data[2][3][i], GraphIO.GML.GMLFormat())
+                for i in 1:length(data.graph_list)
+                        savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data.graph_list[i], GraphIO.GML.GMLFormat())
                 end
         else
 
@@ -32,11 +32,11 @@ function convert_results(;specificrun::String="")
                                 mkdir(joinpath("dataexchange", filename))
                         end
 
-                        CSV.write(joinpath("dataexchange", filename, "sim_df" * ".csv"), data[2][1])
-                        CSV.write(joinpath("dataexchange", filename, "post_df" * ".csv"), data[2][2])
+                        CSV.write(joinpath("dataexchange", filename, "agent_log" * ".csv"), data.agent_log)
+                        CSV.write(joinpath("dataexchange", filename, "post_log" * ".csv"), data.post_log)
 
-                        for i in 1:length(data[2][3])
-                                savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data[2][3][i], GraphIO.GML.GMLFormat())
+                        for i in 1:length(data.graph_list)
+                                savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data.graph_list[i], GraphIO.GML.GMLFormat())
                         end
                 end
         end

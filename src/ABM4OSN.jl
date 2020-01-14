@@ -30,6 +30,7 @@ module ABM4OSN
 
     # contain functions
     include("add_input.jl")
+    include("update_input.jl")
     include("create_agents.jl")
     include("dislike.jl")
     include("drop_input.jl")
@@ -46,8 +47,10 @@ module ABM4OSN
     include("convert_results.jl")
 
     # exports for user interaction
-    export simulate
-    export simulate_batch
+    export Simulation
+    export run!
+    export run_batch
+    export run_resume!
     export convert_results
     export Config
     export cfg_ag
