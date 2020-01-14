@@ -165,17 +165,18 @@ function cfg_feed(
 end
 
 """
-    cfg_mech(;[like=true, dislike=true, share=true])
+    cfg_mech(;[dynamic_net = false, like=true, dislike=true, share=true])
 
 Define mechanics of the social network in an agent-based simulation.
 
 # Example
 ```julia-repl
 julia>cfg_mech()
-(like = true, dislike = false, share = true)
+(dynamic_net = false, like = true, dislike = false, share = true)
 ```
 
 # Arguments
+- `dynamic_net`: whether or not to include functionality 'dynamic net'
 - `like`: whether or not to include functionality 'like'
 - `dislike`: whether or not to include functionality 'dislike'
 - `share`: whether or not to include functionality 'share'
@@ -184,11 +185,13 @@ See also: [Config](@ref), [cfg_net](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg
 """
 function cfg_mech(
     ;
+    dynamic_net::Bool=false,
     like::Bool=true,
     dislike::Bool=false,
     share::Bool=true
 )
     return (
+        dynamic_net=dynamic_net,
         like=like,
         dislike=dislike,
         share=share
@@ -237,8 +240,8 @@ struct Config
         <:Tuple{Int64, Float64}
     }
     mechanics::NamedTuple{
-        (:like, :dislike, :share),
-        NTuple{3,Bool}
+        (:dynamic_net, :like, :dislike, :share),
+        NTuple{4,Bool}
     }
     # constructor
     function Config(

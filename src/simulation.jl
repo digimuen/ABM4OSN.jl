@@ -46,12 +46,15 @@ function tick!(
             update_check_regularity!(state, agent_idx, config)
         elseif this_agent.active
             this_agent.inactive_ticks += 1
-            if this_agent.inactive_ticks > config.simulation.max_inactive_ticks
+            if (this_agent.inactive_ticks > config.simulation.max_inactive_ticks
+                && config.mechanics.dynamic_net)
                 set_inactive!(state, agent_idx, post_list)
             end
         end
     end
-    update_network!(state, config)
+    if config.mechanics.dynamic_net
+        update_network!(state, config)
+    end
     return log_network(state, tick_nr)
 end
 
