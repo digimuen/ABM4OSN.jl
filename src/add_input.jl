@@ -23,6 +23,8 @@ function add_input!(
         append!(input_candidates, setdiff(inneighbors(graph, neighbor), inneighbors(graph, agent_idx)))
     end
 
+    setdiff!(input_candidates, agent_idx)
+
     if length(input_candidates) == 0
         input_queue = Array{Tuple{Int64,Int64}, 1}()
         not_neighbors = setdiff([1:(agent_idx - 1); (agent_idx + 1):nv(graph)], inneighbors(graph, agent_idx))
