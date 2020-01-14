@@ -32,10 +32,12 @@ function add_input!(
             end
         end
 
-        if length(input_queue) == 0 && indegree(graph, agent_idx) <= config.agent_props.min_input_count
-            set_inactive!(state, agent_idx, post_list)
-            this_agent.inactive_ticks = -1
-            return state
+        if (length(input_queue) == 0
+            && indegree(graph, agent_idx) <= config.agent_props.min_input_count
+            && config.mechanics.dynamic_net)
+                set_inactive!(state, agent_idx, post_list)
+                this_agent.inactive_ticks = -1
+                return state
         end
 
         input_queue = first.(sort(input_queue, by=last, rev=true))
