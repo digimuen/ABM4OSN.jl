@@ -91,7 +91,19 @@ function tick!(
                 share!(state, agent_idx, config)
             end
 
-            update_input!(state, agent_idx, config)
+            if config.mechanics.dynamic_net
+                drop_input!(state, agent_idx, config)
+				if (
+					indegree(state[1], agent_idx)
+					< this_agent.desired_input_count
+				)
+					add_input!(state, agent_idx, post_list, config)
+				end
+
+				update_check_regularity!(state, agent_idx, config)
+			else
+				update_input!(state, agent_idx, config)
+			end
 
             inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
@@ -100,8 +112,6 @@ function tick!(
                 end
                 inclin_interact -= 1.0
             end
-
-            update_check_regularity!(state, agent_idx, config)
 
         elseif this_agent.active
             this_agent.inactive_ticks += 1
