@@ -27,7 +27,7 @@ run_resume!("<path/to/tmp_file>")
 
 After the simulation is finished, `run!` will write the results into a newly created directory *results*.
 
-![ABM4OSN workflow.](https://github.com/JohannesNakayama/ABM4OSN.jl/blob/workflow-guide/img/workflow.png)
+!["ABM4OSN workflow."](https://github.com/JohannesNakayama/ABM4OSN.jl/blob/workflow-guide/img/workflow.png)
 
 ## Manipulating parameters
 
