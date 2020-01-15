@@ -4,29 +4,38 @@
 Generate a like for a post.
 
 # Arguments
-- `state`: a tuple of the current graph and agent_list
-- `agent_idx`: agent index
+- `state`: A tuple of the current graph and agent_list
+- `agent_idx`: Agent index
 - `config`: Config object as provided by Config
 
 See also: [`Config`](@ref), [`Agent`](@ref)
 """
 function like!(
-    state::Tuple{AbstractGraph, AbstractArray}, agent_idx::Integer,
+    state::Tuple{AbstractGraph, AbstractArray},
+    agent_idx::Integer,
     config::Config
 )
+
     agent_list = state[2]
     this_agent = agent_list[agent_idx]
 
     for post in this_agent.feed
-        if ((abs(post.opinion - this_agent.opinion) < config.opinion_threshs.like)
+        if (
+            (
+                abs(post.opinion - this_agent.opinion)
+                < config.opinion_threshs.like
+            )
             && !(post in this_agent.liked_posts)
-            && !(post in this_agent.disliked_posts))
+            && !(post in this_agent.disliked_posts)
+        )
             post.like_count += 1
             post.weight *= 1.01
             push!(this_agent.liked_posts, post)
         end
     end
+
     return state
+
 end
 
 # suppress output of include()

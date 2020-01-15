@@ -1,43 +1,90 @@
-import ParserCombinator
+"""
+    convert_results(;[specific_run=""])
 
-function convert_results(;specificrun::String="")
+Convert simulation results for data exchange with other frameworks.
 
-        if specificrun != ""
-                raw_data = load(joinpath("results", specificrun))
-                data = raw_data[first(keys(raw_data))]
-                filename = specificrun[1:first(findfirst(".jld2", specificrun))-1]
+# Arguments
+- `specific_run`: Path to a specific .jld file to be converted
 
-                if !in(filename, readdir("dataexchange"))
-                        mkdir(joinpath("dataexchange", filename))
-                end
+See also: [Config](@ref), [cfg_sim](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref), [cfg_mech](@ref)
+"""
+function convert_results(
+    ;
+    specific_run::String=""
+)
 
-                CSV.write(joinpath("dataexchange", filename, "agent_log" * ".csv"), data.agent_log)
-                CSV.write(joinpath("dataexchange", filename, "post_log" * ".csv"), data.post_log)
+    if specific_run != ""
 
-                for i in 1:length(data.graph_list)
-                        savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data.graph_list[i], GraphIO.GML.GMLFormat())
-                end
-        else
+        raw_data = load(joinpath("results", specific_run))
+        data = raw_data[first(keys(raw_data))]
+        filename = specific_run[1:(first(findfirst(".jld2", specific_run)) - 1)]
 
-                if !in("dataexchange", readdir())
-                        mkdir("dataexchange")
-                end
-
-                for file in readdir("results")
-                        raw_data = load(joinpath("results", file))
-                        data = raw_data[first(keys(raw_data))]
-                        filename = file[1:first(findfirst(".jld2", file))-1]
-
-                        if !in(filename, readdir("dataexchange"))
-                                mkdir(joinpath("dataexchange", filename))
-                        end
-
-                        CSV.write(joinpath("dataexchange", filename, "agent_log" * ".csv"), data.agent_log)
-                        CSV.write(joinpath("dataexchange", filename, "post_log" * ".csv"), data.post_log)
-
-                        for i in 1:length(data.graph_list)
-                                savegraph(joinpath("dataexchange", filename, "graph_$i.gml"), data.graph_list[i], GraphIO.GML.GMLFormat())
-                        end
-                end
+        if !in(filename, readdir("dataexchange"))
+            mkdir(joinpath("dataexchange", filename))
         end
+
+        CSV.write(
+            joinpath("dataexchange", filename, "agent_log" * ".csv"),
+            data.agent_log
+        )
+        CSV.write(
+            joinpath("dataexchange", filename, "post_log" * ".csv"),
+            data.post_log
+        )
+
+        for i in 1:length(data.graph_list)
+            graph_nr = lpad(
+                string(i),
+                ceil(Int, length(data.graph_list) / 10),
+                "0"
+            )
+            savegraph(
+                joinpath("dataexchange", filename, "graph_$graph_nr.gml"),
+                data.graph_list[i],
+                GraphIO.GML.GMLFormat()
+            )
+        end
+
+    else
+
+        if !in("dataexchange", readdir())
+            mkdir("dataexchange")
+        end
+
+        for file in readdir("results")
+
+            raw_data = load(joinpath("results", file))
+            data = raw_data[first(keys(raw_data))]
+            filename = file[1:(first(findfirst(".jld2", file)) - 1)]
+
+            if !in(filename, readdir("dataexchange"))
+                mkdir(joinpath("dataexchange", filename))
+            end
+
+            CSV.write(
+                joinpath("dataexchange", filename, "agent_log" * ".csv"),
+                data.agent_log
+            )
+            CSV.write(
+                joinpath("dataexchange", filename, "post_log" * ".csv"),
+                data.post_log
+            )
+
+            for i in 1:length(data.graph_list)
+                graph_nr = lpad(
+                    string(i),
+                    ceil(Int, length(data.graph_list) / 10),
+                    "0"
+                )
+                savegraph(
+                    joinpath("dataexchange", filename, "graph_$graph_nr.gml"),
+                    data.graph_list[i],
+                    GraphIO.GML.GMLFormat()
+                )
+            end
+
+        end
+
+    end
+
 end
