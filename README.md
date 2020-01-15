@@ -45,7 +45,7 @@ To create experiments with *ABM4OSN*, you can follow this workflow:
 
 
 
-#### 1) Configuration
+### 1) Configuration
 
 Simulation parameters can be manipulated with the `Config` interface. `Config` is a type with six attributes:
 
@@ -73,27 +73,27 @@ This is the configuration for a simulation of a network with *like* and *share* 
 
 ```
 cfg = Config(
-    cfg_net(
+    network=cfg_net(
         agent_count=100,
         new_follows=2
     ),
-    cfg_sim(
+    simulation=cfg_sim(
         n_iter=1000
     ),
-    cfg_ot(
+    opinion_threshs=cfg_ot(
         like=0.3,
         share=0.2,
         backfire=0.3
     ),
-    cfg_ag(
+    agent_props=cfg_ag(
         own_opinion_weight=0.95,
         mean_desired_input_count=10
     ),
-    cfg_feed(
+    feed_props=cfg_feed(
         feed_size=10,
         post_decay=0.5
     ),
-    cfg_mech(
+    mechanics=cfg_mech(
         dynamic_net=false,
         like=true,
         dislike=false,
@@ -102,7 +102,7 @@ cfg = Config(
 )
 ```
 
-#### 2) Simulation
+### 2) Simulation
 
 The next step is to create an instance of type `Simulation` which requires a `Config` object (like the one created in the first step).
 
@@ -110,7 +110,7 @@ The next step is to create an instance of type `Simulation` which requires a `Co
 sim = Simulation(config=cfg)
 ```
 
-#### 3) Run the simulation
+### 3) Run the simulation
 
 The `Simulation` object is then given to the `run!` function. The `run!` function updates the result attributes of the `Simulation` object and writes the resulting data to a folder named *results*. By default, the .jld filename will be `_.jld`; this can be altered with the `name` parameter.
 
@@ -118,6 +118,10 @@ The `Simulation` object is then given to the `run!` function. The `run!` functio
 run!(sim, name="example_simulation")
 ```
 
-#### 4) Convert the results
+### 4) Convert the results
 
 As the results are stored in .jld format first, there is an additional convenience function called `convert_results` which converts the logging format and graph data to .csv and to .gml format respectively and write them into a directory called *data_exchange*.
+
+```
+convert_results(specific_run="example_simulation.jld2")
+```
