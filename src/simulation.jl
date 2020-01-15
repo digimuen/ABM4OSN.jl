@@ -8,7 +8,7 @@ Provide data structure for a simulation.
 julia>using ABM4OSN
 
 julia>Simulation()
-Simulation(Config(), 0, 0, DataFrame(), 0, AbstractGraph[])
+Simulation{Config, Any, Any, DataFrame, Any, Array{AbstractGraph}}
 ```
 
 # Arguments
@@ -22,6 +22,7 @@ Simulation(Config(), 0, 0, DataFrame(), 0, AbstractGraph[])
 See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@ref), [generate_check_regularity](@ref), [generate_desired_input_count](@ref)
 """
 mutable struct Simulation
+
     config::Config
     init_state::Any
     final_state::Any
@@ -39,8 +40,12 @@ mutable struct Simulation
             Array{AbstractGraph, 1}(undef, 0)
         )
     end
+
 end
 
+Base.show(io::IO, s::Simulation) = print(
+    io, "Simulation{Config, Any, Any, DataFrame, Any, Array{AbstractGraph}}"
+)
 
 """
     tick!(state, post_list, tick_nr, config)
@@ -60,12 +65,15 @@ function tick!(
     post_list::AbstractArray,
     tick_nr::Int64, config::Config
 )
+
     agent_list = state[2]
 
     for agent_idx in shuffle(1:length(agent_list))
+
         this_agent = agent_list[agent_idx]
 
         if this_agent.active && (rand() < this_agent.check_regularity)
+
             this_agent.inactive_ticks = 0
             update_feed!(state, agent_idx, config)
             update_perceiv_publ_opinion!(state, agent_idx)
@@ -82,13 +90,10 @@ function tick!(
             if config.mechanics.share
                 share!(state, agent_idx, config)
             end
-            # drop_input!(state, agent_idx, config)
-            # if indegree(state[1], agent_idx) < this_agent.desired_input_count
-            #     add_input!(state, agent_idx, post_list, config)
-            # end
-            update_input!(state, agent_idx, config)
-            inclin_interact = deepcopy(this_agent.inclin_interact)
 
+            update_input!(state, agent_idx, config)
+
+            inclin_interact = deepcopy(this_agent.inclin_interact)
             while inclin_interact > 0
                 if rand() < inclin_interact
                     publish_post!(state, post_list, agent_idx, tick_nr)
@@ -100,7 +105,6 @@ function tick!(
 
         elseif this_agent.active
             this_agent.inactive_ticks += 1
-
             if (
                 this_agent.inactive_ticks > config.simulation.max_inactive_ticks
                 && config.mechanics.dynamic_net
@@ -116,6 +120,7 @@ function tick!(
     end
 
     return log_network(state, tick_nr)
+
 end
 
 """
@@ -165,6 +170,7 @@ function run!(
         append!(agent_log, tick!(state, post_log, i, simulation.config))
 
         if i % ceil(simulation.config.simulation.n_iter / 10) == 0
+
             print(".")
             current_network = deepcopy(state[1])
             rem_vertices!(
@@ -178,7 +184,9 @@ function run!(
             simulation.post_log = post_log
 
             save(joinpath("tmp", name * ".jld2"), string(i), simulation)
+
         end
+
     end
 
     simulation.final_state = state
@@ -209,28 +217,31 @@ function run!(
     )
 
     return simulation
+
 end
 
 """
-    run_batch(configlist; batch_desc)
+    run_batch(config_list; batch_desc)
 
 Creates the initial state, performs and logs simulation ticks and returns the collected data
 
 # Arguments
-- `configlist`: List of Config objects as provided by Config()
+- `config_list`: List of `Config` objects as provided by `Config()`
 - `batch_name`: Name of current simulation batch
 
 See also: [run!](@ref), [tick!](@ref), [Config](@ref)
 """
 function run_batch(
-    configlist::Array{Config, 1}
+    config_list::Array{Config, 1}
     ;
     batch_name::String = ""
 )
-
-    for i in 1:length(configlist)
-        run_nr = lpad(string(i),ceil(Int, length(configlist)/10),"0")
-        run!(Simulation(configlist[i]), batch_desc = (batch_name * "_run$run_nr"))
+    for i in 1:length(config_list)
+        run_nr = lpad(string(i),ceil(Int, length(config_list)/10),"0")
+        run!(
+            Simulation(config_list[i]),
+            batch_desc = (batch_name * "_run$run_nr")
+        )
     end
 end
 
@@ -287,6 +298,7 @@ function run_resume!(
 
             save(joinpath("tmp", batch_desc * ".jld2"), string(i), simulation)
         end
+
     end
 
     simulation.final_state = state
@@ -318,6 +330,7 @@ function run_resume!(
     )
 
     return simulation
+
 end
 
 # suppress output of include()
