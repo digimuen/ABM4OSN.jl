@@ -19,26 +19,31 @@ function update_input!(
     graph, agent_list = state
     this_agent = agent_list[agent_idx]
 
-    input_candidates = append!(
-        [dst(e) for e in edges(graph) if !(
-            e in union(inneighbors(graph, agent_idx), agent_idx)
-            )
-        ],
-        [1:(agent_idx - 1); (agent_idx + 1):nv(graph)]
+    pref_attach_list = append!(
+        [dst(e) for e in edges(graph)],
+        1:nv(graph)
     )
 
-    input_queue = shuffle(input_candidates)
+    exclude = union(inneighbors(graph, agent_idx), agent_idx)
 
-    if (length(input_queue) - config.network.new_follows) < 0
-        new_input_count = length(input_queue)
+    function draw_new_input(pref_attach_list, exclude)
+        draw = rand(pref_attach_list)
+        if draw in exclude
+            draw = draw_new_input(pref_attach_list, exclude)
+        end
+        return draw
+    end
+
+    if (length(exclude) >= (nv(graph) - config.network.new_follows))
+        new_input_count = nv(graph) - length(exclude) - 1
     else
         new_input_count = config.network.new_follows
     end
 
     for _ in 1:new_input_count
-        new_neighbor = popfirst!(input_queue)
+        new_neighbor = draw_new_input(pref_attach_list, exclude)
         add_edge!(graph, new_neighbor, agent_idx)
-        deleteat!(input_queue, findall(x -> x == new_neighbor, input_queue))
+        push!(exclude, new_neighbor)
     end
 
     unfollow_candidates = Array{Tuple{Int64, Float64}, 1}()
@@ -50,11 +55,12 @@ function update_input!(
         )
     end
 
-    sort!(unfollow_candidates, by = last)
+    sort!(unfollow_candidates, by=last)
 
     for i in 1:config.network.new_follows
-    rem_edge!(graph, popfirst!(unfollow_candidates)[1], agent_idx)
+        rem_edge!(graph, popfirst!(unfollow_candidates)[1], agent_idx)
     end
 
     return state
+
 end
