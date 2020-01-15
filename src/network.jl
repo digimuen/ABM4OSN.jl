@@ -21,6 +21,7 @@ julia> create_network(Config(network = cfg(net(agent_count = 100))))
 See also: [`update_network!`](@ref)
 """
 function create_network(
+    agent_list::AbstractArray,
     config::Config
 )
     # this algorithm is modelled after the python networkx implementation:
