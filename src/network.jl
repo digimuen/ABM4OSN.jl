@@ -1,9 +1,10 @@
 """
-    create_network(n, m0)
+    create_network(config)
 
 Create a network with the Barabási-Albert model.
 
 # Arguments
+
 - `config`: Config file
 
 # Example
@@ -12,7 +13,7 @@ julia> using Random
 
 julia> Random.seed!(0);
 
-julia> create_network(Config())
+julia> create_network(Config(network = cfg(net(agent_count = 100))))
 {100, 206} directed simple Int64 graph
 
 ```
@@ -20,7 +21,7 @@ julia> create_network(Config())
 See also: [`update_network!`](@ref)
 """
 function create_network(
-    agent_list, config
+    config::Config
 )
     # this algorithm is modelled after the python networkx implementation:
     # https://github.com/networkx/networkx/blob/master/networkx/generators/random_graphs.py#L655
@@ -29,19 +30,24 @@ function create_network(
     pref_attach_list = collect(1:config.network.agent_count)
 
     for source in 1:config.network.agent_count
+
         shuffle!(pref_attach_list)
         m0 = agent_list[source].desired_input_count
+
         if m0 >= config.network.agent_count
             m0 = config.network.agent_count - 1
         elseif m0 <= 0
             break
         end
+
         targets = Array{Int64}(undef, 0)
 
         for i in pref_attach_list
+
             if length(targets) >= m0
                 break
             end
+
             if !(i in targets) && i != source
                 push!(targets, i)
             end
@@ -50,6 +56,7 @@ function create_network(
         for e in zip(targets, fill(source, m0))
             add_edge!(g, e[1], e[2])
         end
+
         append!(pref_attach_list, targets)
     end
 
@@ -72,7 +79,10 @@ function update_network!(
     config::Config
 )
     graph, agent_list = state
-    pref_attach_list = [src(e) for e in edges(graph) if agent_list[src(e)].active]
+    pref_attach_list = [
+        src(e) for e in edges(graph) if agent_list[src(e)].active
+    ]
+
     for _ in 1:config.network.growth_rate
         push!(
             agent_list,
@@ -81,17 +91,24 @@ function update_network!(
                 generate_opinion(),
                 generate_inclin_interact(),
                 generate_check_regularity(),
-                generate_desired_input_count(config.agent_props.mean_desired_input_count)
+                generate_desired_input_count(
+                    config.agent_props.mean_desired_input_count
+                )
             )
         )
+
         add_vertex!(graph)
         targets = Array{Int64}(undef, 0)
 
         shuffle!(pref_attach_list)
         for i in pref_attach_list
-            if length(targets) >= ceil(Int, last(agent_list).desired_input_count / 2)
+            if (
+                length(targets)
+                >= ceil(Int, last(agent_list).desired_input_count / 2)
+            )
                 break
             end
+
             if !(i in targets) && i != nv(graph)
                 push!(targets, i)
             end
@@ -101,6 +118,7 @@ function update_network!(
             add_edge!(graph, t, nv(graph))
         end
     end
+
     return state
 end
 
