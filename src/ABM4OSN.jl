@@ -20,17 +20,18 @@ module ABM4OSN
     using JLD2
     using CSV
     using GraphIO
+    import ParserCombinator
 
     # contain structs
-    include("config.jl")
     include("post.jl")
     include("agent.jl")
+    include("config.jl")
     include("network.jl")
     include("simulation.jl")
 
     # contain functions
     include("add_input.jl")
-    include("update_input.jl")
+    include("convert_results.jl")
     include("create_agents.jl")
     include("dislike.jl")
     include("drop_input.jl")
@@ -42,22 +43,22 @@ module ABM4OSN
     include("set_inactive.jl")
     include("update_check_regularity.jl")
     include("update_feed.jl")
+    include("update_input.jl")
     include("update_opinion.jl")
     include("update_perceiv_publ_opinion.jl")
-    include("convert_results.jl")
 
     # exports for user interaction
-    export Simulation
-    export run!
-    export run_batch
-    export run_resume!
-    export convert_results
     export Config
+    export Simulation
     export cfg_ag
     export cfg_feed
     export cfg_net
     export cfg_ot
     export cfg_sim
     export cfg_mech
+    export run!
+    export run_batch
+    export run_resume!
+    export convert_results
 
 end # module
