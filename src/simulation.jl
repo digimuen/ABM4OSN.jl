@@ -137,7 +137,7 @@ function run!(
 
     agent_list = create_agents(simulation.config)
     simulation.init_state = (
-        create_network(simulation.config), agent_list
+        create_network(agent_list, simulation.config), agent_list
     )
     state = deepcopy(simulation.init_state)
     post_log = Array{Post, 1}(undef, 0)

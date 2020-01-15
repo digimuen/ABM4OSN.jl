@@ -60,7 +60,7 @@ mutable struct Post
     end
 end
 
-Base.:<(x::Post, y::Post) = x.weight < y.weight
+Base.:isless(x::Post, y::Post) = x.weight < y.weight
 
 # suppress output of include()
 ;
