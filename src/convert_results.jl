@@ -35,7 +35,7 @@ function convert_results(
         for i in 1:length(data.graph_list)
             graph_nr = lpad(
                 string(i),
-                ceil(Int, length(data.graph_list) / 10),
+                length(string(length(graph_list))),
                 "0"
             )
             savegraph(
@@ -73,7 +73,7 @@ function convert_results(
             for i in 1:length(data.graph_list)
                 graph_nr = lpad(
                     string(i),
-                    ceil(Int, length(data.graph_list) / 10),
+                    length(string(length(graph_list))),
                     "0"
                 )
                 savegraph(
