@@ -247,7 +247,7 @@ function run_batch(
     batch_name::String = ""
 )
     for i in 1:length(config_list)
-        run_nr = lpad(string(i),ceil(Int, length(config_list)/10),"0")
+        run_nr = lpad(string(i),length(string(length(config_list))),"0")
         run!(
             Simulation(config_list[i]),
             batch_desc = (batch_name * "_run$run_nr")
