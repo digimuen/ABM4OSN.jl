@@ -26,12 +26,12 @@ function add_input!(
         append!(
             input_candidates,
             setdiff(
-                inneighbors(graph, neighbor), inneighbors(graph, agent_idx)
+                inneighbors(graph, neighbor),
+                inneighbors(graph, agent_idx),
+                agent_idx
             )
         )
     end
-
-    setdiff!(input_candidates, agent_idx)
 
     if length(input_candidates) == 0
 
@@ -84,15 +84,19 @@ function add_input!(
     for _ in 1:new_input_count
         new_neighbor = popfirst!(input_queue)
         add_edge!(graph, new_neighbor, agent_idx)
-        if (abs(this_agent.opinion - agent_list[new_neighbor].opinion) < config.opinion_threshs.follow
+        if (
+            (
+                abs(this_agent.opinion - agent_list[new_neighbor].opinion)
+                < config.opinion_threshs.follow
+            )
             && outdegree(graph, agent_idx) > outdegree(graph, new_neighbor)
-            && rand() < 0.5)
+            && rand() < 0.5
+        )
             add_edge!(graph, agent_idx, new_neighbor)
         end
     end
 
     return state
-
 end
 
 # suppress output of include()

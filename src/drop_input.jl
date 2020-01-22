@@ -38,7 +38,7 @@ function drop_input!(
                 )
                     push!(
                         unfollow_candidates,
-                        (post.source_agent, indegree(graph, post.source_agent))
+                        (post.source_agent, outdegree(graph, post.source_agent))
                     )
                 elseif (
                     (
@@ -48,7 +48,7 @@ function drop_input!(
                 )
                     push!(
                         unfollow_candidates,
-                        (post.source_agent, indegree(graph, post.source_agent))
+                        (post.source_agent, outdegree(graph, post.source_agent))
                     )
                 end
             end
@@ -64,7 +64,7 @@ function drop_input!(
             indegree(graph,agent_idx) * config.agent_props.unfollow_rate
         )
     )
-    
+
     for i in 1:drop_count
         rem_edge!(graph, unfollow_candidates[i][1],agent_idx)
     end
