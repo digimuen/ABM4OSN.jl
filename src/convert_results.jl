@@ -35,7 +35,7 @@ function convert_results(
         for i in 1:length(data.graph_list)
             graph_nr = lpad(
                 string(i),
-                length(string(length(graph_list))),
+                length(string(length(data.graph_list))),
                 "0"
             )
             savegraph(
@@ -52,6 +52,10 @@ function convert_results(
         end
 
         for file in readdir("results")
+
+            if !occursin("jld2", file)
+                continue
+            end
 
             raw_data = load(joinpath("results", file))
             data = raw_data[first(keys(raw_data))]

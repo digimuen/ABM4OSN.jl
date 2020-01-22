@@ -250,7 +250,7 @@ function run_batch(
         run_nr = lpad(string(i),length(string(length(config_list))),"0")
         run!(
             Simulation(config_list[i]),
-            batch_desc = (batch_name * "_run$run_nr")
+            name = (batch_name * "_run$run_nr")
         )
     end
 end
@@ -277,16 +277,20 @@ function run_resume!(
 
     raw_data = load(path)
 
-    batch_desc = (
+    name = (
         path[first(findlast("\\", path))+1:first(findfirst(".jld2", path))-1]
     )
 
     tick_nr = parse(Int, first(keys(raw_data))) + 1
-    simulation = collect(values(tempresult))[1]
+    simulation = collect(values(raw_data))[1]
 
     state = simulation.final_state
     agent_log = simulation.agent_log
     post_log = simulation.post_log
+
+	for i in 1:Int((ticknr - 1) / simulation.config.simulation.ticks * 10)
+		print(".")
+	end
 
     for i in tick_nr:simulation.config.simulation.n_iter
 
@@ -306,7 +310,7 @@ function run_resume!(
             simulation.agent_log = agent_log
             simulation.post_log = post_log
 
-            save(joinpath("tmp", batch_desc * ".jld2"), string(i), simulation)
+            save(joinpath("tmp", name * ".jld2"), string(i), simulation)
         end
 
     end
@@ -327,8 +331,8 @@ function run_resume!(
     if !in("results", readdir())
         mkdir("results")
     end
-    save(joinpath("results", batch_desc * ".jld2"), batch_desc, simulation)
-    rm(joinpath("tmp", batch_desc * ".jld2"))
+    save(joinpath("results", name * ".jld2"), name, simulation)
+    rm(joinpath("tmp", name * ".jld2"))
 
     if length(readdir("tmp")) == 0
         rm("tmp")
