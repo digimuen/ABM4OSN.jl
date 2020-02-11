@@ -23,6 +23,13 @@ function convert_results(
             mkdir(joinpath("dataexchange", filename))
         end
 
+        Base.open(
+            joinpath("dataexchange", filename, "config.json"),
+            "w"
+        ) do io
+            Base.write(io, JSON.json(data.config))
+        end
+
         CSV.write(
             joinpath("dataexchange", filename, "agent_log" * ".csv"),
             data.agent_log
@@ -65,6 +72,13 @@ function convert_results(
                 mkdir(joinpath("dataexchange", filename))
             end
 
+            Base.open(
+                joinpath("dataexchange", filename, "config.json"),
+                "w"
+            ) do io
+                Base.write(io, JSON.json(data.config))
+            end
+
             CSV.write(
                 joinpath("dataexchange", filename, "agent_log" * ".csv"),
                 data.agent_log
@@ -77,7 +91,7 @@ function convert_results(
             for i in 1:length(data.graph_list)
                 graph_nr = lpad(
                     string(i),
-                    length(string(length(graph_list))),
+                    length(string(length(data.graph_list))),
                     "0"
                 )
                 savegraph(
