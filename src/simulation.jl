@@ -63,7 +63,8 @@ See also: [log_network](@ref), [simulate!](@ref), [Config](@ref)
 function tick!(
     state::Tuple{AbstractGraph, AbstractArray},
     post_list::AbstractArray,
-    tick_nr::Int64, config::Config
+    tick_nr::Int64,
+	config::Config
 )
 
     agent_list = state[2]
@@ -99,7 +100,6 @@ function tick!(
 				)
 					add_input!(state, agent_idx, post_list, config)
 				end
-
 				update_check_regularity!(state, agent_idx, config)
 			else
 				update_input!(state, agent_idx, config)
@@ -147,7 +147,7 @@ See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
 function run!(
     simulation::Simulation=Simulation()
     ;
-    name::String = "_"
+    name::String="_"
 )
 
     agent_list = create_agents(simulation.config)
@@ -158,17 +158,17 @@ function run!(
     post_log = Array{Post, 1}(undef, 0)
     simulation.graph_list = Array{AbstractGraph, 1}([simulation.init_state[1]])
     agent_log = DataFrame(
-        TickNr = Int64[],
-        AgentID = Int64[],
-        Opinion = Float64[],
-        PerceivPublOpinion = Float64[],
-        CheckRegularity = Float64[],
-        InclinInteract = Float64[],
-        DesiredInputCount = Int64[],
-        InactiveTicks = Int64[],
-        Indegree = Int64[],
-        Outdegree = Int64[],
-        ActiveState = Bool[]
+        TickNr=Int64[],
+        AgentID=Int64[],
+        Opinion=Float64[],
+        PerceivPublOpinion=Float64[],
+        CheckRegularity=Float64[],
+        InclinInteract=Float64[],
+        DesiredInputCount=Int64[],
+        InactiveTicks=Int64[],
+        Indegree=Int64[],
+        Outdegree=Int64[],
+        ActiveState=Bool[]
     )
 
     if !("tmp" in readdir())

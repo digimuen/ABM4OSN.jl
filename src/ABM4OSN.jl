@@ -18,6 +18,7 @@ module ABM4OSN
     using StatsBase
     using JLD
     using JLD2
+    using JSON
     using CSV
     using GraphIO
     import ParserCombinator
