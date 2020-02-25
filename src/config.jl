@@ -41,23 +41,28 @@ Define configuration parameters for the simulation run.
 julia>using ABM4OSN
 
 julia>cfg_sim()
-(n_iter = 100, max_inactive_ticks = 2)
+(n_iter = 100, max_inactive_ticks = 2, logging = false)
 ```
 
 # Arguments
 - `n_iter`: Number of iterations
 - `max_inactive_ticks`: After how many ticks an agent's status is set to inactive
+- `Logging`: Determines if extended logging on simulation run is performed
 
 See also: [Config](@ref), [cfg_net](@ref), [cfg_ot](@ref), [cfg_ag](@ref), [cfg_feed](@ref), [cfg_mech](@ref)
 """
 function cfg_sim(
     ;
     n_iter::Int64=100,
-    max_inactive_ticks::Int64=2
+    max_inactive_ticks::Int64=2,
+    logging::Bool=false,
+    repcount::Int64=1
 )
     return (
         n_iter=n_iter,
-        max_inactive_ticks=max_inactive_ticks
+        max_inactive_ticks=max_inactive_ticks,
+        logging=logging,
+        repcount=repcount
     )
 end
 
@@ -247,9 +252,11 @@ struct Config
     simulation::NamedTuple{
         (
             :n_iter,
-            :max_inactive_ticks
+            :max_inactive_ticks,
+            :logging,
+            :repcount
         ),
-        NTuple{2, Int64}
+        <:Tuple{Int64, Int64, Bool, Int64}
     }
     opinion_threshs::NamedTuple{
         (
@@ -308,7 +315,7 @@ struct Config
             mechanics
         )
     end
-    
+
 end
 
 # suppress output of include()

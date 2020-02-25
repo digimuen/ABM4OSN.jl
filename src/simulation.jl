@@ -24,6 +24,8 @@ See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@re
 mutable struct Simulation
 
     config::Config
+	repnr::Int64
+	rng::MersenneTwister
     init_state::Any
     final_state::Any
     agent_log::DataFrame
@@ -33,6 +35,8 @@ mutable struct Simulation
     function Simulation(config=Config())
         new(
             config,
+			0,
+			MersenneTwister(),
             (nothing, nothing),
             (nothing, nothing),
             DataFrame(),
@@ -150,83 +154,100 @@ function run!(
     name::String="_"
 )
 
-    agent_list = create_agents(simulation.config)
-    simulation.init_state = (
-        create_network(agent_list, simulation.config), agent_list
-    )
-    state = deepcopy(simulation.init_state)
-    post_log = Array{Post, 1}(undef, 0)
-    simulation.graph_list = Array{AbstractGraph, 1}([simulation.init_state[1]])
-    agent_log = DataFrame(
-        TickNr=Int64[],
-        AgentID=Int64[],
-        Opinion=Float64[],
-        PerceivPublOpinion=Float64[],
-        CheckRegularity=Float64[],
-        InclinInteract=Float64[],
-        DesiredInputCount=Int64[],
-        InactiveTicks=Int64[],
-        Indegree=Int64[],
-        Outdegree=Int64[],
-        ActiveState=Bool[]
-    )
+	if name * ".jld2" in readdir("results")
+		raw = load(joinpath("results", name * ".jld2"))
+		rep = raw[first(keys(raw))]
+	else
+		rep = Simulation[]
+	end
 
-    if !("tmp" in readdir())
-        mkdir("tmp")
-    end
+	for current_rep in 1:simulation.config.simulation.repcount
 
-    for i in 1:simulation.config.simulation.n_iter
+		simulation.repnr = length(rep) + 1
+		simulation.rng = MersenneTwister(sum(codeunits(name)) + simulation.repnr)
+		Random.seed!(simulation.rng)
+	    agent_list = create_agents(simulation.config)
+	    simulation.init_state = (
+	        create_network(agent_list, simulation.config), agent_list
+	    )
+	    state = deepcopy(simulation.init_state)
+	    post_log = Array{Post, 1}(undef, 0)
 
-        append!(agent_log, tick!(state, post_log, i, simulation.config))
+		if simulation.config.simulation.logging
+		    simulation.graph_list = Array{AbstractGraph, 1}([simulation.init_state[1]])
+		    agent_log = DataFrame(
+		        TickNr = Int64[],
+		        AgentID = Int64[],
+		        Opinion = Float64[],
+		        PerceivPublOpinion = Float64[],
+		        CheckRegularity = Float64[],
+		        InclinInteract = Float64[],
+		        DesiredInputCount = Int64[],
+		        InactiveTicks = Int64[],
+		        Indegree = Int64[],
+		        Outdegree = Int64[],
+		        ActiveState = Bool[]
+		    )
+		end
 
-        if i % ceil(simulation.config.simulation.n_iter / 10) == 0
+	    for i in 1:simulation.config.simulation.n_iter
 
-            print(".")
-            current_network = deepcopy(state[1])
-            rem_vertices!(
-                current_network,
-                [agent.id for agent in state[2] if !agent.active]
-            )
-            push!(simulation.graph_list, current_network)
+			if simulation.config.simulation.logging
+				append!(
+					agent_log,
+					tick!(state, post_log, i, simulation.config))
+			else
+				tick!(state, post_log, i, simulation.config)
+			end
 
-            simulation.final_state = state
-            simulation.agent_log = agent_log
-            simulation.post_log = post_log
 
-            save(joinpath("tmp", name * ".jld2"), string(i), simulation)
+	        if i % ceil(simulation.config.simulation.n_iter / 10) == 0
 
-        end
+	            print(".")
 
-    end
+				if (
+					simulation.config.simulation.logging
+					&& simulation.config.mechanics.dynamic_net
+				)
+					current_network = deepcopy(state[1])
+		            rem_vertices!(
+		                current_network,
+		                [agent.id for agent in state[2] if !agent.active]
+		            )
+		            push!(simulation.graph_list, current_network)
+				end
+	        end
+	    end
 
-    simulation.final_state = state
-    simulation.agent_log = agent_log
-    simulation.post_log = DataFrame(
-        Opinion = [p.opinion for p in post_log],
-        Weight = [p.weight for p in post_log],
-        Source_Agent = [p.source_agent for p in post_log],
-        Published_At = [p.published_at for p in post_log],
-        Seen = [p.seen_by for p in post_log],
-        Likes = [p.like_count for p in post_log],
-        Dislikes = [p.dislike_count for p in post_log],
-        Reposts = [p.share_count for p in post_log]
-    )
+	    simulation.final_state = state
+		if simulation.config.simulation.logging
+			simulation.agent_log = agent_log
+		    simulation.post_log = DataFrame(
+		        Opinion = [p.opinion for p in post_log],
+		        Weight = [p.weight for p in post_log],
+		        Source_Agent = [p.source_agent for p in post_log],
+		        Published_At = [p.published_at for p in post_log],
+		        Seen = [p.seen_by for p in post_log],
+		        Likes = [p.like_count for p in post_log],
+		        Dislikes = [p.dislike_count for p in post_log],
+		        Reposts = [p.share_count for p in post_log]
+		    )
+		end
 
-    if !("results" in readdir())
-        mkdir("results")
-    end
-    save(joinpath("results", name * ".jld2"), name, simulation)
-    rm(joinpath("tmp", name * ".jld2"))
-    if length(readdir("tmp")) == 0
-        rm("tmp")
-    end
+		push!(rep, deepcopy(simulation))
+
+		if !in("results", readdir())
+	        mkdir("results")
+	    end
+    	save(joinpath("results", name * ".jld2"), name, rep)
+	end
 
     print(
         "\n---\nFinished simulation run with the following specifications:\n
         $(simulation.config)\n---\n"
     )
 
-    return simulation
+    return rep
 
 end
 
@@ -244,9 +265,11 @@ See also: [run!](@ref), [tick!](@ref), [Config](@ref)
 function run_batch(
     config_list::Array{Config, 1}
     ;
+    resume_at::Int64=1,
+    stop_at::Int64=length(configlist),
     batch_name::String = ""
 )
-    for i in 1:length(config_list)
+    for i in resume_at:stop_at
         run_nr = lpad(string(i),length(string(length(config_list))),"0")
         run!(
             Simulation(config_list[i]),
