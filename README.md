@@ -41,7 +41,7 @@ The function `run!` will create a directory named *results* and write the defaul
 
 To create experiments with *ABM4OSN*, you can follow this workflow:
 
-!["ABM4OSN workflow."](https://github.com/JohannesNakayama/ABM4OSN.jl/blob/workflow-guide/img/workflow.png)
+!["ABM4OSN workflow."](https://github.com/digimuen/ABM4OSN.jl/blob/workflow-guide/img/workflow.png)
 
 
 
