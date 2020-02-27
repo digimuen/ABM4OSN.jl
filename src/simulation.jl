@@ -23,8 +23,10 @@ See also: [Post](@ref), [generate_opinion](@ref), [generate_inlinc_interact](@re
 """
 mutable struct Simulation
 
-    config::Config
+	name::String
+	batch_name::String
 	repnr::Int64
+	config::Config
 	rng::MersenneTwister
     init_state::Any
     final_state::Any
@@ -32,10 +34,12 @@ mutable struct Simulation
     post_log::Any
     graph_list::Array{AbstractGraph}
 
-    function Simulation(config=Config())
+    function Simulation(config=Config(), batch_name="")
         new(
-            config,
+			"",
+			batch_name,
 			0,
+            config,
 			MersenneTwister(),
             (nothing, nothing),
             (nothing, nothing),
@@ -47,9 +51,9 @@ mutable struct Simulation
 
 end
 
-Base.show(io::IO, s::Simulation) = print(
-    io, "Simulation{Config, Any, Any, DataFrame, Any, Array{AbstractGraph}}"
-)
+# Base.show(io::IO, s::Simulation) = print(
+#     io, "Simulation{Config, Any, Any, DataFrame, Any, Array{AbstractGraph}}"
+# )
 
 """
     tick!(state, post_list, tick_nr, config)
@@ -138,7 +142,7 @@ function tick!(
 end
 
 """
-    simulate(simulation=Simulation(); [batch_desc="_"])
+    run!(simulation=Simulation(); [name="_"])
 
 Creates the initial state, performs and logs simulation ticks and returns the collected data
 
@@ -146,7 +150,7 @@ Creates the initial state, performs and logs simulation ticks and returns the co
 - `simulation`: Simulation object that provides data structure for simulation results and a config
 - `name`: Name of current simulation
 
-See also: [log_network](@ref), [tick!](@ref), [Config](@ref)
+See also: [rerun_single!](@ref), [log_network](@ref), [tick!](@ref), [Config](@ref)
 """
 function run!(
     simulation::Simulation=Simulation()
@@ -163,10 +167,11 @@ function run!(
 
 	for current_rep in 1:simulation.config.simulation.repcount
 
+		simulation.name = name
 		simulation.repnr = length(rep) + 1
-		simulation.rng = MersenneTwister(sum(codeunits(name)) + simulation.repnr)
-		Random.seed!(simulation.rng)
-	    agent_list = create_agents(simulation.config)
+		simulation.rng = Random.seed!(sum(codeunits(name)) + simulation.repnr)
+
+		agent_list = create_agents(simulation.config)
 	    simulation.init_state = (
 	        create_network(agent_list, simulation.config), agent_list
 	    )
@@ -260,115 +265,132 @@ Creates the initial state, performs and logs simulation ticks and returns the co
 - `config_list`: List of `Config` objects as provided by `Config()`
 - `batch_name`: Name of current simulation batch
 
-See also: [run!](@ref), [tick!](@ref), [Config](@ref)
+See also: [run!](@ref), [rerun_single!](@ref), [tick!](@ref), [Config](@ref)
 """
 function run_batch(
     config_list::Array{Config, 1}
     ;
     resume_at::Int64=1,
-    stop_at::Int64=length(configlist),
+    stop_at::Int64=length(config_list),
     batch_name::String = ""
 )
     for i in resume_at:stop_at
         run_nr = lpad(string(i),length(string(length(config_list))),"0")
         run!(
-            Simulation(config_list[i]),
+            Simulation(config_list[i], batch_name=batch_name),
             name = (batch_name * "_run$run_nr")
         )
     end
 end
 
 """
-    run_resume!(path)
+    rerun_single!(path)
 
-Resumes a simulation based on a temporary state
+Repeats a single simulation run with detailed simulation tracking
 
 # Arguments
-- `path`: Path to temporary state of simulation
+- `simulation_imported`: Simulation object of the run that shall be repeated
+- `logging`: Bool for activating the detailed logging
 
-See also: [run!](@ref), [tick!](@ref), [Config](@ref)
+See also: [run_batch](@ref), [run!](@ref), [tick!](@ref), [Config](@ref)
 """
-function run_resume!(
-    path::String = "_"
-)
+function rerun_single!(
+    simulation_imported::Simulation;
+    logging::Bool = true
+    )
+    simulation = deepcopy(simulation_imported)
 
-    if !("tmp" in readdir())
-        mkdir("tmp")
-    elseif "tmp" in readdir() && path == "_"
-        path = joinpath("tmp", readdir("tmp")[1])
-    end
-
-    raw_data = load(path)
-
-    name = (
-        path[first(findlast("\\", path))+1:first(findfirst(".jld2", path))-1]
+    simulation.config = Config(
+        network = simulation.config.network,
+        simulation = cfg_sim(
+			n_iter = simulation.config.simulation.n_iter,
+			max_inactive_ticks = simulation.config.simulation.max_inactive_ticks,
+            repcount = simulation.config.simulation.repcount,
+            logging = logging
+        ),
+        opinion_threshs = simulation.config.opinion_threshs,
+        agent_props = simulation.config.agent_props,
+		feed_props = simulation.config.feed_props,
+		mechanics = simulation.config.mechanics
     )
 
-    tick_nr = parse(Int, first(keys(raw_data))) + 1
-    simulation = collect(values(raw_data))[1]
+	Random.seed!(simulation.rng.seed)
+	agent_list = create_agents(simulation.config)
+	simulation.init_state = (
+		create_network(agent_list, simulation.config), agent_list
+	)
+	state = deepcopy(simulation.init_state)
+	post_log = Array{Post, 1}(undef, 0)
 
-    state = simulation.final_state
-    agent_log = simulation.agent_log
-    post_log = simulation.post_log
-
-	for i in 1:Int((ticknr - 1) / simulation.config.simulation.ticks * 10)
-		print(".")
+	if simulation.config.simulation.logging
+		simulation.graph_list = Array{AbstractGraph, 1}([simulation.init_state[1]])
+		agent_log = DataFrame(
+			TickNr = Int64[],
+			AgentID = Int64[],
+			Opinion = Float64[],
+			PerceivPublOpinion = Float64[],
+			CheckRegularity = Float64[],
+			InclinInteract = Float64[],
+			DesiredInputCount = Int64[],
+			InactiveTicks = Int64[],
+			Indegree = Int64[],
+			Outdegree = Int64[],
+			ActiveState = Bool[]
+		)
 	end
 
-    for i in tick_nr:simulation.config.simulation.n_iter
+	for i in 1:simulation.config.simulation.n_iter
 
-        append!(agent_log, tick!(state, post_log, i, simulation.config))
+		if simulation.config.simulation.logging
+			append!(
+				agent_log,
+				tick!(state, post_log, i, simulation.config))
+		else
+			tick!(state, post_log, i, simulation.config)
+		end
 
-        if i % ceil(simulation.config.simulation.n_iter / 10) == 0
-            print(".")
-            current_network = deepcopy(state[1])
-            rem_vertices!(
-                current_network,
-                [agent.id for agent in state[2] if !agent.active]
-            )
 
-            push!(simulation.graph_list, current_network)
+		if i % ceil(simulation.config.simulation.n_iter / 10) == 0
 
-            simulation.final_state = state
-            simulation.agent_log = agent_log
-            simulation.post_log = post_log
+			print(".")
 
-            save(joinpath("tmp", name * ".jld2"), string(i), simulation)
-        end
+			if (
+				simulation.config.simulation.logging
+				&& simulation.config.mechanics.dynamic_net
+			)
+				current_network = deepcopy(state[1])
+				rem_vertices!(
+					current_network,
+					[agent.id for agent in state[2] if !agent.active]
+				)
+				push!(simulation.graph_list, current_network)
+			end
+		end
+	end
 
-    end
+	simulation.final_state = state
+	if simulation.config.simulation.logging
+		simulation.agent_log = agent_log
+		simulation.post_log = DataFrame(
+			Opinion = [p.opinion for p in post_log],
+			Weight = [p.weight for p in post_log],
+			Source_Agent = [p.source_agent for p in post_log],
+			Published_At = [p.published_at for p in post_log],
+			Seen = [p.seen_by for p in post_log],
+			Likes = [p.like_count for p in post_log],
+			Dislikes = [p.dislike_count for p in post_log],
+			Reposts = [p.share_count for p in post_log]
+		)
+	end
 
-    simulation.final_state = state
-    simulation.agent_log = agent_log
-    simulation.post_log = DataFrame(
-        Opinion = [p.opinion for p in post_log],
-        Weight = [p.weight for p in post_log],
-        Source_Agent = [p.source_agent for p in post_log],
-        Published_At = [p.published_at for p in post_log],
-        Seen = [p.seen_by for p in post_log],
-        Likes = [p.like_count for p in post_log],
-        Dislikes = [p.dislike_count for p in post_log],
-        Reposts = [p.share_count for p in post_log]
-    )
-
-    if !in("results", readdir())
+	if !in("results", readdir())
         mkdir("results")
     end
-    save(joinpath("results", name * ".jld2"), name, simulation)
-    rm(joinpath("tmp", name * ".jld2"))
+    save(joinpath("results", simulation.name * "_singlerun.jld2"), simulation.name, simulation)
 
-    if length(readdir("tmp")) == 0
-        rm("tmp")
-    end
-
-    print(
-        "\n---\nFinished simulation run with the following specifications:\n
-        $(simulation.config)\n---\n"
-    )
-
-    return simulation
-
+	return simulation
 end
+
 
 # suppress output of include()
 ;

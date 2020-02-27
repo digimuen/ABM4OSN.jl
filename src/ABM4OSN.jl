@@ -59,7 +59,7 @@ module ABM4OSN
     export cfg_mech
     export run!
     export run_batch
-    export run_resume!
+    export rerun_single!
     export convert_results
 
 end # module
