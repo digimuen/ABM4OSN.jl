@@ -36,6 +36,7 @@ module ABM4OSN
     include("create_agents.jl")
     include("dislike.jl")
     include("drop_input.jl")
+    include("evaluate_results.jl")
     include("generate_agent_props.jl")
     include("like.jl")
     include("log_network.jl")
@@ -60,6 +61,7 @@ module ABM4OSN
     export run!
     export run_batch
     export rerun_single!
+    export evaluate_results
     export convert_results
 
 end # module

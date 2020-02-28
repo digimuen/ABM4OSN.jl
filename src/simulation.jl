@@ -34,7 +34,7 @@ mutable struct Simulation
     post_log::Any
     graph_list::Array{AbstractGraph}
 
-    function Simulation(config=Config(), batch_name="")
+    function Simulation(config=Config(); batch_name="")
         new(
 			"",
 			batch_name,
@@ -158,7 +158,7 @@ function run!(
     name::String="_"
 )
 
-	if name * ".jld2" in readdir("results")
+	if "results" in readdir() && name * ".jld2" in readdir("results")
 		raw = load(joinpath("results", name * ".jld2"))
 		rep = raw[first(keys(raw))]
 	else
